@@ -75,16 +75,8 @@ for name in ['1', '2', '3', '4', '5', 'A', 'B', 'C', 'D', 'E', 'Arrow', 'Circle'
     cv.imshow("card", symbol_card)
 
     symbol_card_blur = cv.GaussianBlur(symbol_card, (5, 5), 0)
-    _, symbol_thresh = cv.threshold(
-        src=symbol_card_blur,
-        thresh=threshold,
-        maxval=255,
-        type=cv.THRESH_BINARY)
-    _, symbol_thresh_inv = cv.threshold(
-        src=symbol_card_blur,
-        thresh=threshold,
-        maxval=255,
-        type=cv.THRESH_BINARY_INV)
+    _, symbol_thresh = cv.threshold(symbol_card_blur, threshold, 255, cv.THRESH_BINARY)
+    _, symbol_thresh_inv = cv.threshold(symbol_card_blur, threshold, 255, cv.THRESH_BINARY_INV)
 
     cv.imshow("symbol_thresh", symbol_thresh)
     cv.imshow("symbol_thresh_inv", symbol_thresh_inv)
