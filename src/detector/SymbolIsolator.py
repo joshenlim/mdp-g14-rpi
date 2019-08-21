@@ -6,7 +6,12 @@ import numpy as np
 import time
 import os
 
-import Symbols
+from src.config import CAMERA_RES_WIDTH
+from src.config import CAMERA_RES_HEIGHT
+from src.config import CAMERA_FRAMERATE
+from src.config import SYMBOL_TYPES
+from src.config import IMG_DIR
+from src.detector.utils import flatten_image
 
 '''
 Standalone script to extract threshold images of each symbol
@@ -23,19 +28,20 @@ to grayscale, then applying Gaussian Blur prior to generating the
 treshold images.
 '''
 
-output_dir = os.path.dirname(os.path.abspath(__file__)) + '/images'
-# 100 is a good value for BGYW, for red set to 30
-threshold = 50
+# For Blue, White, Green, Yellow, 100 seems good
+# For Red, threshold has to be brought down to 30
+threshold = 100
 
 camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(640, 480))
+camera.resolution = (CAMERA_RES_WIDTH, CAMERA_RES_HEIGHT)
+camera.framerate = CAMERA_FRAMERATE
+camera.rotation = 180
+rawCapture = PiRGBArray(camera, size=(CAMERA_RES_WIDTH, CAMERA_RES_HEIGHT))
 
 # Allow time for camera to initialize
 time.sleep(1)
 
-for name in ['1', '2', '3', '4', '5', 'A', 'B', 'C', 'D', 'E', 'Arrow', 'Circle']:
+for name in SYMBOL_TYPES:
     filename = name + '.jpg'
 
     print('Press "p" to take a picture of ' + filename)
@@ -56,13 +62,12 @@ for name in ['1', '2', '3', '4', '5', 'A', 'B', 'C', 'D', 'E', 'Arrow', 'Circle'
     _, thresh = cv.threshold(blur, 100, 255, cv.THRESH_BINARY)
 
     _, contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    contours = sorted(contours, key=cv.contourArea, reverse=True)
 
     if len(contours) == 0:
         print('Error: No Contours Found!')
         quit()
 
-    symbol_contour = contours[0]
+    symbol_contour = max(contours, key=cv.contourArea)
     x, y, w, h = cv.boundingRect(symbol_contour)
 
     # Approximate corner points of the symbol card
@@ -71,29 +76,17 @@ for name in ['1', '2', '3', '4', '5', 'A', 'B', 'C', 'D', 'E', 'Arrow', 'Circle'
     pts = np.float32(approx)
 
     # Flatten image to extract symbol card
-    symbol_card = Symbols.flatten_image(image, pts, w, h)
+    symbol_card = flatten_image(image, pts, w, h)
     cv.imshow("card", symbol_card)
 
     symbol_card_blur = cv.GaussianBlur(symbol_card, (5, 5), 0)
-    _, symbol_thresh = cv.threshold(
-        src=symbol_card_blur,
-        thresh=threshold,
-        maxval=255,
-        type=cv.THRESH_BINARY)
-    _, symbol_thresh_inv = cv.threshold(
-        src=symbol_card_blur,
-        thresh=threshold,
-        maxval=255,
-        type=cv.THRESH_BINARY_INV)
-
-    cv.imshow("symbol_thresh", symbol_thresh)
-    cv.imshow("symbol_thresh_inv", symbol_thresh_inv)
+    _, symbol_thresh = cv.threshold(symbol_card_blur, threshold, 255, cv.THRESH_BINARY)
+    _, symbol_thresh_inv = cv.threshold(symbol_card_blur, threshold, 255, cv.THRESH_BINARY_INV)
 
     print('Press "s" to save and continue.')
     key = cv.waitKey(0) & 0xFF
     if key == ord('s'):
-        cv.imwrite(output_dir + '/' + filename, symbol_thresh)
-        cv.imwrite(output_dir + '_inv/' + filename, symbol_thresh_inv)
+        cv.imwrite(IMG_DIR + '/' + filename, symbol_thresh)
         print('Success: Saved image for ' + filename)
     else:
         print('Notice: Skipped over ' + filename)

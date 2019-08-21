@@ -1,6 +1,21 @@
-import numpy as np
 import cv2 as cv
+import numpy as np
 
+from src.config import THRESHOLD
+
+def preprocess_frame(image):
+    '''
+    Returns the grayscaled, blurred and threshold camera image
+    Currently threshold value of 40 seems to be working fine
+    for all colors, but may need to look into adaptive thresholding
+    depending on ambient light conditions
+    '''
+
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    blur = cv.GaussianBlur(gray, (5, 5), 0)
+    _, thresh = cv.threshold(blur, THRESHOLD, 255, cv.THRESH_BINARY)
+    return thresh
+    
 def flatten_image(image, pts, width, height):
     '''
     Flatten image of a symbol card into a top-down perspective
