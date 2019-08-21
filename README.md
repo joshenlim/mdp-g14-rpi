@@ -2,7 +2,8 @@
 Raspberry Pi Codebase for CZ3004 MDP
 
 Python Version = 3.4.2
-Ensure that OpenCV is installed
+
+Ensure that OpenCV 3.3.0 is installed
 
 ## To run
 - Symbol Threshold Extraction: `python3 -m src.detector.SymbolIsolator.py`
