@@ -19,13 +19,6 @@ print('Initializing PiCamera...')
 time.sleep(3)
 cam_quit = 0
 
-# Create a main.py, remove playgrounds
-# Assumingly will have folders for rpi
-# one for symbol detection, the other for communication
-# ultimately main.py should establish communication and
-# init symbol detection process
-# wrap everything accordingly
-
 print('Detecting for Symbols - press "q" to quit')
 
 while cam_quit == 0:
