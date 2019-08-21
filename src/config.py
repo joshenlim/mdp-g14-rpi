@@ -8,7 +8,7 @@ THRESHOLD = 75
 MATCH_THRESHOLD = 0.23
 
 SYMBOL_TYPES = ['1', '2', '3', '4', '5', 'A', 'B', 'C', 'D', 'E', 'Arrow', 'Circle']
-IMG_DIR = os.path.dirname(os.path.abspath(__file__)) + '/train_images'
+IMG_DIR = os.path.dirname(os.path.abspath(__file__)) + '/detector/train_images'
 
 SYMBOL_ID_MAP = {
     'Arrow': 0,

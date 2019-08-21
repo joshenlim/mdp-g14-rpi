@@ -6,12 +6,12 @@ import numpy as np
 import time
 import os
 
-from config import CAMERA_RES_WIDTH
-from config import CAMERA_RES_HEIGHT
-from config import CAMERA_FRAMERATE
-from config import SYMBOL_TYPES
-from config import IMG_DIR
-from utils import flatten_image
+from src.config import CAMERA_RES_WIDTH
+from src.config import CAMERA_RES_HEIGHT
+from src.config import CAMERA_FRAMERATE
+from src.config import SYMBOL_TYPES
+from src.config import IMG_DIR
+from src.detector.utils import flatten_image
 
 '''
 Standalone script to extract threshold images of each symbol

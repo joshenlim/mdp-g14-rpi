@@ -1,8 +1,8 @@
 import numpy as np
 import cv2 as cv
 
-from config import SYMBOL_TYPES
-from config import SYMBOL_ID_MAP
+from src.config import SYMBOL_TYPES
+from src.config import SYMBOL_ID_MAP
 
 class Symbols:
     '''

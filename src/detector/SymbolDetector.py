@@ -3,14 +3,14 @@ import numpy as np
 import time
 import os
 
-from config import CAMERA_RES_WIDTH
-from config import CAMERA_RES_HEIGHT
-from config import CAMERA_FRAMERATE
-from config import IMG_DIR
-from config import MATCH_THRESHOLD
-from utils import preprocess_frame
-import VideoStream
-import Symbols
+from src.config import CAMERA_RES_WIDTH
+from src.config import CAMERA_RES_HEIGHT
+from src.config import CAMERA_FRAMERATE
+from src.config import IMG_DIR
+from src.config import MATCH_THRESHOLD
+from src.detector.utils import preprocess_frame
+import src.detector.VideoStream as VideoStream
+import src.detector.Symbols as Symbols
 
 video_stream = VideoStream.VideoStream((CAMERA_RES_WIDTH, CAMERA_RES_HEIGHT), CAMERA_FRAMERATE).start()
 train_symbols = Symbols.load_symbols(IMG_DIR)

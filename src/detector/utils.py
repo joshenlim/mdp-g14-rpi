@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-from config import THRESHOLD
+from src.config import THRESHOLD
 
 def preprocess_frame(image):
     '''
