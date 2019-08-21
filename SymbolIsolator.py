@@ -10,8 +10,8 @@ from config import CAMERA_RES_WIDTH
 from config import CAMERA_RES_HEIGHT
 from config import CAMERA_FRAMERATE
 from config import SYMBOL_TYPES
+from config import IMG_DIR
 from utils import flatten_image
-from utils import perspective_transform
 
 '''
 Standalone script to extract threshold images of each symbol
@@ -28,8 +28,6 @@ to grayscale, then applying Gaussian Blur prior to generating the
 treshold images.
 '''
 
-output_dir = os.path.dirname(os.path.abspath(__file__)) + '/images'
-
 # For Blue, White, Green, Yellow, 100 seems good
 # For Red, threshold has to be brought down to 30
 threshold = 100
@@ -37,6 +35,7 @@ threshold = 100
 camera = PiCamera()
 camera.resolution = (CAMERA_RES_WIDTH, CAMERA_RES_HEIGHT)
 camera.framerate = CAMERA_FRAMERATE
+camera.rotation = 180
 rawCapture = PiRGBArray(camera, size=(CAMERA_RES_WIDTH, CAMERA_RES_HEIGHT))
 
 # Allow time for camera to initialize
@@ -87,8 +86,7 @@ for name in SYMBOL_TYPES:
     print('Press "s" to save and continue.')
     key = cv.waitKey(0) & 0xFF
     if key == ord('s'):
-        cv.imwrite(output_dir + '/' + filename, symbol_thresh)
-        cv.imwrite(output_dir + '_inv/' + filename, symbol_thresh_inv)
+        cv.imwrite(IMG_DIR + '/' + filename, symbol_thresh)
         print('Success: Saved image for ' + filename)
     else:
         print('Notice: Skipped over ' + filename)
