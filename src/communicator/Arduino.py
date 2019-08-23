@@ -16,9 +16,9 @@ class Arduino:
         self.connection = None
 
     def show_settings(self):
-        print(f'Serial Port: {self.serial_port}')
-        print(f'Baud Rate: {self.baud_rate}')
-        print(f'Connection Established: {self.connection is not None}')
+        print('Serial Port: ' + str(self.serial_port))
+        print('Baud Rate: ' + str(self.baud_rate))
+        print('Connection Established: ' + str(self.connection is not None))
 
     def connect(self):
         log.info('Attempting connection with Arduino')
@@ -30,18 +30,18 @@ class Arduino:
                 log.info('Successfully connected with Arduino')
                 self.read()
         except Exception as error:
-            log.error(f'Connection with Arduino failed: {error}')
+            log.error('Connection with Arduino failed: ' + str(error))
     
     def write(self, msg):
         try:
             self.connection.write(msg)
             log.info('Successfully wrote message to Arduino')
         except Exception as error:
-            log.error(f'Arduino write failed: {error}')
+            log.error('Arduino write failed: ' + str(error))
 
     def read(self):
         try:
             msg = self.connection.readline()
             return msg            
         except Exception as error:
-            log.error(f'Arduino read failed: {error}')
+            log.error('Arduino read failed: ' + str(error))
