@@ -50,3 +50,36 @@ def flatten_image(image, pts, width, height):
     crop = warp[40:-40, 40:-40]
 
     return crop
+
+def extract_extreme_points(contour):
+    extLeft = tuple(contour[contour[:, :, 0].argmin()][0])
+    extRight = tuple(contour[contour[:, :, 0].argmax()][0])
+    extTop = tuple(contour[contour[:, :, 1].argmin()][0])
+    extBottom = tuple(contour[contour[:, :, 1].argmax()][0])
+
+    return extLeft, extTop, extRight, extBottom
+
+def extract_detected_symbol_thresh(image, extLeft, extTop, extRight, extBottom):
+    placeholder_box = np.zeros((4, 2), dtype="float32")
+    placeholder_box[0] = (extLeft[0], extTop[1]) # Top Left
+    placeholder_box[1] = (extRight[0], extTop[1]) # Top Right
+    placeholder_box[2] = (extRight[0], extBottom[1]) # Bottom Left
+    placeholder_box[3] = (extLeft[0], extBottom[1]) # Bottom Right
+
+    placeholder_width = extRight[0] - extLeft[0]
+    placeholder_height = extBottom[1] - extTop[1]
+
+    dst = np.array([
+        [0,0],
+        [placeholder_width - 1, 0],
+        [placeholder_width - 1, placeholder_height - 1],
+        [0, placeholder_height - 1]
+    ], np.float32)
+    M = cv.getPerspectiveTransform(placeholder_box, dst)
+    warp = cv.warpPerspective(image, M, (placeholder_width, placeholder_height))
+    warp = cv.cvtColor(warp, cv.COLOR_BGR2GRAY)
+
+    symbol_card_blur = cv.GaussianBlur(warp, (5, 5), 0)
+    _, symbol_thresh = cv.threshold(symbol_card_blur, 100, 255, cv.THRESH_BINARY)
+    
+    return symbol_thresh
