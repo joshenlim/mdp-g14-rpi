@@ -27,10 +27,17 @@ class Arduino:
             time.sleep(3)
 
             if self.connection is not None:
-                log.info('Successfully connected with Arduino')
+                log.info('Successfully connected with Arduino:' + str(self.connection.name))
                 self.read()
         except Exception as error:
             log.error('Connection with Arduino failed: ' + str(error))
+
+    def disconnect(self):
+        try:
+            self.connection.close()
+            log.info('Successfully closed connection with Arduino')
+        except Exception as error:
+            log.error('Arduino close connection failed: ' + str(error))
     
     def write(self, msg):
         try:
