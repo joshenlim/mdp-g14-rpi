@@ -1,7 +1,14 @@
 import os
 
-SERIAL_PORT = "/dev/ttyACM0"
+# Android BT connection settings
 
+# PC Wifi connection settings
+
+# Arduino USB connection settings
+SERIAL_PORT = "/dev/ttyACM0"
+BAUD_RATE = 115200
+
+# Image Recognition Settings
 CAMERA_RES_WIDTH = 640
 CAMERA_RES_HEIGHT = 480
 CAMERA_FRAMERATE = 30

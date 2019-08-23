@@ -1,21 +1,29 @@
 import serial
 import time
 from src.Logger import Logger
+from src.config import SERIAL_PORT
+from src.config import BAUD_RATE
 
 log = Logger()
 
-# Will need to figure out how to get name of port for which Arduino USB is connected to
+# Arduino will need an accompanying script to receive the data from Rpi
+# Communication has to be two ways, Rpi send, Arduino receive and reply, Rpi receive
 
 class Arduino:
-    def __init__(self, port):
-        self.port = port
-        self.baud_rate = 0
+    def __init__(self, serial_port=SERIAL_PORT, baud_rate=BAUD_RATE):
+        self.serial_port = serial_port
+        self.baud_rate = baud_rate
         self.connection = None
+
+    def show_settings(self):
+        print(f'Serial Port: {self.serial_port}')
+        print(f'Baud Rate: {self.baud_rate}')
+        print(f'Connection Established: {self.connection is not None}')
 
     def connect(self):
         log.info('Attempting connection with Arduino')
         try:
-            self.connection = serial.Serial(port, self.baud_rate, timeout=3)
+            self.connection = serial.Serial(self.serial_port, self.baud_rate, timeout=3)
             time.sleep(3)
 
             if self.connection is not None:
