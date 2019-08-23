@@ -26,7 +26,8 @@ class Arduino:
     
     def write(self, msg):
         try:
-            self.connection.write(msg + '|')
+            self.connection.write(msg)
+            log.info('Successfully wrote message to Arduino')
         except Exception as error:
             log.error(f'Arduino write failed: {error}')
 
