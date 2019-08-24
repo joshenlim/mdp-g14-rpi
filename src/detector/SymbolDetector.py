@@ -18,6 +18,7 @@ from src.detector.Symbols import load_symbols
 from src.Logger import Logger
 
 log = Logger()
+font = cv.FONT_HERSHEY_SIMPLEX
 
 class SymbolDetector:
     def __init__(self, width=CAMERA_RES_WIDTH, height=CAMERA_RES_HEIGHT, framerate=CAMERA_FRAMERATE):
@@ -70,6 +71,14 @@ class SymbolDetector:
                 closest_match = min(match_results, key=lambda x: x['score'])
                 if closest_match['score'] < MATCH_THRESHOLD:
                     cv.imshow('Matching Symbol', closest_match['img'])
+                    cv.putText(
+                        image,
+                        'Symbol: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']),
+                        (extLeft[0], extTop[1] - 20),
+                        font,
+                        1.0,
+                        (0, 255, 0)
+                    )
                     print('Found: ' + str(closest_match['symbol']) + '; Image ID: ' + str(closest_match['id']))
 
             cv.imshow("Video Stream", image)
