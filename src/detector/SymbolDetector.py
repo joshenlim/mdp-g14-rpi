@@ -44,11 +44,7 @@ class SymbolDetector:
 
                 extLeft, extTop, extRight, extBottom = extract_extreme_points(symbol_contour)
 
-                # To replace with bounding box instead
-                cv.circle(image, (extLeft[0], extTop[1]), 8, (0, 255, 0), 2)
-                cv.circle(image, (extRight[0], extTop[1]), 8, (0, 255, 0), 2)
-                cv.circle(image, (extRight[0], extBottom[1]), 8, (0, 255, 0), 2)
-                cv.circle(image, (extLeft[0], extBottom[1]), 8, (0, 255, 0), 2)
+                cv.rectangle(image, (extLeft[0], extTop[1]), (extRight[0], extBottom[1]), (0, 255, 0), 2)
 
                 symbol_thresh = extract_detected_symbol_thresh(image, extLeft, extTop, extRight, extBottom)
 
