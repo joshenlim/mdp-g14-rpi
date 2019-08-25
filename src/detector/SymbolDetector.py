@@ -42,10 +42,10 @@ class SymbolDetector:
             _, contours, hierarchy = cv.findContours(pre_proc_frame, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
             contours = sorted(contours, key=cv.contourArea, reverse=True)
             filtered_contours = filter_contour_size(contours)
+            # cv.drawContours(image, filtered_contours, -1, (255, 0, 0), 3)
 
-            if len(contours) > 1:
+            if len(filtered_contours) > 0:
                 symbol_contour = filtered_contours[0]
-                cv.drawContours(image, [symbol_contour], -1, (0, 255, 0), 3)
                 
                 x, y, w, h = cv.boundingRect(symbol_contour)
                 cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
