@@ -8,10 +8,12 @@ from src.config import CAMERA_RES_HEIGHT
 from src.config import CAMERA_FRAMERATE
 from src.config import IMG_DIR
 from src.config import MATCH_THRESHOLD
+from src.config import MATCH_CONFIDENCE_COUNT
 
 from src.detector.utils import preprocess_frame
 from src.detector.utils import extract_extreme_points
 from src.detector.utils import extract_detected_symbol_thresh
+from src.detector.utils import filter_contour_size
 
 from src.detector.VideoStream import VideoStream
 from src.detector.Symbols import load_symbols
@@ -25,6 +27,8 @@ class SymbolDetector:
         log.info('Initializing Symbol Detector and PiCamera')
         self.video_stream = VideoStream((width, height), framerate)
         self.train_symbols = load_symbols(IMG_DIR)
+        self.match_symbol_id = None
+        self.match_count = 0
         self.cam_quit = 0
 
     def detect(self):
@@ -34,25 +38,23 @@ class SymbolDetector:
         while self.cam_quit == 0:
             image = self.video_stream.read()
             pre_proc_frame = preprocess_frame(image)
+            cv.imshow('pp', pre_proc_frame)
             _, contours, hierarchy = cv.findContours(pre_proc_frame, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
             contours = sorted(contours, key=cv.contourArea, reverse=True)
+            filtered_contours = filter_contour_size(contours)
 
             if len(contours) > 1:
-                symbol_contour = contours[1]
+                symbol_contour = filtered_contours[0]
                 cv.drawContours(image, [symbol_contour], -1, (0, 255, 0), 3)
                 
                 x, y, w, h = cv.boundingRect(symbol_contour)
+                cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
                 extLeft, extTop, extRight, extBottom = extract_extreme_points(symbol_contour)
-
-                cv.rectangle(image, (extLeft[0], extTop[1]), (extRight[0], extBottom[1]), (0, 255, 0), 2)
-
                 symbol_thresh = extract_detected_symbol_thresh(image, extLeft, extTop, extRight, extBottom)
-
-                cv.imshow("Detected Object", symbol_thresh)
+                # cv.imshow("Detected Object", symbol_thresh)
 
                 match_results = []
-
                 for train_symbol in self.train_symbols:
                     train_symbol_gray = cv.cvtColor(train_symbol.img, cv.COLOR_BGR2GRAY)
                     _, train_symbol_thresh = cv.threshold(train_symbol_gray, 127, 255, 0)
@@ -70,7 +72,7 @@ class SymbolDetector:
 
                 closest_match = min(match_results, key=lambda x: x['score'])
                 if closest_match['score'] < MATCH_THRESHOLD:
-                    cv.imshow('Matching Symbol', closest_match['img'])
+                    # cv.imshow('Matching Symbol', closest_match['img'])
                     cv.putText(
                         image,
                         'Symbol: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']),
@@ -79,7 +81,18 @@ class SymbolDetector:
                         1.0,
                         (0, 255, 0)
                     )
-                    print('Found: ' + str(closest_match['symbol']) + '; Image ID: ' + str(closest_match['id']))
+
+                    if self.match_symbol_id == closest_match['id']:
+                        self.match_count = self.match_count + 1
+                        if (self.match_count == MATCH_CONFIDENCE_COUNT):
+                            # TO-DO: Ping to PC/N7 about the detected Symbol's ID
+                            log.info('Found: ' + str(closest_match['symbol']) + '; Image ID: ' + str(closest_match['id']))
+                    else:
+                        self.match_symbol_id = closest_match['id']
+                        self.match_count = 1
+                else:
+                    self.match_symbol_id = None
+                    self.match_count = 0
 
             cv.imshow("Video Stream", image)
             key = cv.waitKey(1) & 0xFF

@@ -9,11 +9,14 @@ SERIAL_PORT = "/dev/ttyACM0"
 BAUD_RATE = 115200
 
 # Image Recognition Settings
-CAMERA_RES_WIDTH = 640
+CAMERA_RES_WIDTH = 540
 CAMERA_RES_HEIGHT = 480
 CAMERA_FRAMERATE = 30
 
-THRESHOLD = 75
+MIN_CONTOUR_AREA = 5500 # Assuming at a distance of 20 - 25cm
+MAX_CONTOUR_AREA = 15000 # Assuming min distance of 10 - 15cm
+MATCH_CONFIDENCE_COUNT = 5
+THRESHOLD = 80
 MATCH_THRESHOLD = 0.23
 
 SYMBOL_TYPES = ['1', '2', '3', '4', '5', 'A', 'B', 'C', 'D', 'E', 'Arrow', 'Circle']

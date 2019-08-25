@@ -2,6 +2,8 @@ import cv2 as cv
 import numpy as np
 
 from src.config import THRESHOLD
+from src.config import MIN_CONTOUR_AREA
+from src.config import MAX_CONTOUR_AREA
 
 def preprocess_frame(image):
     '''
@@ -50,6 +52,12 @@ def flatten_image(image, pts, width, height):
     crop = warp[40:-40, 40:-40]
 
     return crop
+
+def filter_contour_size(contours):
+    filtered = filter(
+        lambda x: cv.contourArea(x) >= MIN_CONTOUR_AREA and cv.contourArea(x) <= MAX_CONTOUR_AREA,
+        contours)
+    return list(filtered)
 
 def extract_extreme_points(contour):
     extLeft = tuple(contour[contour[:, :, 0].argmin()][0])
