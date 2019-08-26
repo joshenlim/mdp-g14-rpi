@@ -39,7 +39,10 @@ class SymbolDetector:
         while self.cam_quit == 0:
             image = self.video_stream.read()
             pre_proc_frame = preprocess_frame(image)
-            cv.imshow('pp', pre_proc_frame)
+
+            # Uncomment if debugging threshold value
+            # cv.imshow('Frame Thresh', pre_proc_frame)
+            
             _, contours, hierarchy = cv.findContours(pre_proc_frame, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
             contours = sorted(contours, key=cv.contourArea, reverse=True)
             filtered_contours = filter_contour_size(contours)
@@ -78,12 +81,12 @@ class SymbolDetector:
 
                     # If detected arrow, further derive arrow orientation
                     if closest_match['id'] == 0:
-                        cv.circle(image, (extLeft[0], extLeft[1]), 8, (0, 0, 255), 2)
-                        cv.circle(image, (extTop[0], extTop[1]), 8, (0, 0, 255), 2)
-                        cv.circle(image, (extRight[0], extRight[1]), 8, (0, 0, 255), 2)
-                        cv.circle(image, (extBottom[0], extBottom[1]), 8, (0, 0, 255), 2)
-
-                        cv.circle(image, (int(((extLeft[0] + extRight[0]) / 2)), int(((extTop[1] + extBottom[1]) / 2))), 8, (0, 0, 255), 2)
+                        # Uncomment if debugging for arrow detection
+                        # cv.circle(image, (extLeft[0], extLeft[1]), 8, (0, 0, 255), 2)
+                        # cv.circle(image, (extTop[0], extTop[1]), 8, (0, 0, 255), 2)
+                        # cv.circle(image, (extRight[0], extRight[1]), 8, (0, 0, 255), 2)
+                        # cv.circle(image, (extBottom[0], extBottom[1]), 8, (0, 0, 255), 2)
+                        # cv.circle(image, (int(((extLeft[0] + extRight[0]) / 2)), int(((extTop[1] + extBottom[1]) / 2))), 8, (0, 0, 255), 2)
 
                         arrow_name, arrow_id = derive_arrow_orientation(extLeft, extTop, extRight, extBottom)
                         closest_match['symbol'] = arrow_name

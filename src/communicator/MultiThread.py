@@ -3,13 +3,23 @@ import queue
 import os
 
 from src.Logger import Logger
+from src.detector.SymbolDetector import SymbolDetector
 from src.communicator.Arduino import Arduino
+# from src.communicator.Pc import Pc
+# from src.communicator.Android import Android
 
 log = Logger()
 
 '''
-TO-DO: Relook at readAndroid, writeAndroid,readPc and writePc
-once the classes are up. Figure out if this multithread is working
+Multithreading essentially refers to running multiple processes in parallel
+Communications between Rpi and other devices involve a session, which means
+the Rpi will be waiting for a trigger. Hence if single threaded, Rpi can only
+do one thing at one time. With multhreading, Rpi can have multiple sessions
+simultaneuously. Image Recognition will have to be run as a thread as well, but
+it seems to be running really slow at the moment. There's also an occasional
+error: Camera component couldn't be enabled: Out of resources. If hit that error
+just restart the process, wait a little for the resources to be released, then re
+run the main program
 '''
 
 class MultiThread:
@@ -18,6 +28,7 @@ class MultiThread:
         self.android = None
         self.arduino = Arduino()
         self.pc = None
+        self.detector = SymbolDetector()
 
         # self.android.connect()
         # self.arduino.connect()
@@ -35,6 +46,8 @@ class MultiThread:
         # _thread.start_new_thread(self.writeAndroid, (self.androidQueue))
         # _thread.start_new_thread(self.writeArduino, (self.arduinoQueue))
         # _thread.start_new_thread(self.writePc, (self.pcQueue))
+
+        _thread.start_new_thread(self.detector.detect, ())
         log.info('Multithread Communication Session Started')
 
         while True:
@@ -44,6 +57,7 @@ class MultiThread:
         # self.android.disconnect()
         # self.arduino.disconnect()
         # self.pc.disconnect()
+        self.detector.end()
         log.info('Multithread Communication Session Ended')
 
     def readAndroid(self):
