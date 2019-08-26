@@ -18,6 +18,7 @@ MAX_CONTOUR_AREA = 6800 # Assuming min distance of 10 - 15cm
 MATCH_CONFIDENCE_COUNT = 5
 THRESHOLD = 75
 MATCH_THRESHOLD = 0.23
+ARROW_PIXEL_THRESHOLD = 10
 
 SYMBOL_TYPES = ['1', '2', '3', '4', '5', 'A', 'B', 'C', 'D', 'E', 'Arrow', 'Circle']
 IMG_DIR = os.path.dirname(os.path.abspath(__file__)) + '/detector/train_images'

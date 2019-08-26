@@ -2,8 +2,14 @@ import cv2 as cv
 import numpy as np
 
 from src.config import THRESHOLD
+from src.config import ARROW_PIXEL_THRESHOLD
 from src.config import MIN_CONTOUR_AREA
 from src.config import MAX_CONTOUR_AREA
+from src.config import SYMBOL_ID_MAP
+
+from src.Logger import Logger
+
+log = Logger()
 
 def preprocess_frame(image):
     '''
@@ -91,3 +97,52 @@ def extract_detected_symbol_thresh(image, extLeft, extTop, extRight, extBottom):
     _, symbol_thresh = cv.threshold(symbol_card_blur, 100, 255, cv.THRESH_BINARY)
     
     return symbol_thresh
+
+def derive_arrow_orientation(extLeft, extTop, extRight, extBottom):
+    '''
+    Filter which points are on the same x and y axis as the midpoint
+    There should only be 3 points passing through the two filters at max
+    in total since the extracted point on the flat edge of the arrow will
+    not be at the midpoint.
+    Whichever axis only one filtered point, the arrow's orientation will be
+    in the other axis. i.e if len(filter_y) == 1, arrow is horizontal
+    This implies that arrow tip is at the same y level as the midpoint
+    Finally we check in the axis with only one filtered point whether it's
+    before or after the midpoint to determine the exact direction of the arrow.
+    '''
+    x_midpoint = int((extLeft[0] + extRight[0]) / 2)
+    y_midpoint = int((extTop[1] + extBottom[1]) /2 )
+
+    arrow_name = ''
+    filter_x = []
+    filter_y = []
+    
+    for pnt in [extLeft, extTop, extRight, extBottom]:
+        if abs(pnt[0] - x_midpoint) < ARROW_PIXEL_THRESHOLD:
+            filter_x.append(pnt)
+        elif abs(pnt[1] - y_midpoint) < ARROW_PIXEL_THRESHOLD:
+            filter_y.append(pnt)
+
+    if len(filter_x) == 1:
+        # Arrow is vertical
+        arrow_tip = filter_x[0][1]
+        if (arrow_tip > y_midpoint):
+            # Arrow is Down
+            arrow_name =  'Arrow_red'
+        else:
+            # Arrow is Up
+            arrow_name =  'Arrow_white'
+    elif len(filter_y) == 1:
+        # Arrow is horizontal
+        arrow_tip = filter_y[0][0]
+        if (arrow_tip > x_midpoint):
+            # Arrow is Right
+            arrow_name = 'Arrow_green'
+        else:
+            # Arrow is Left
+            arrow_name = 'Arrow_blue'
+    else:
+        arrow_name = 'Arrow'
+        
+    return arrow_name, SYMBOL_ID_MAP[arrow_name]
+    
