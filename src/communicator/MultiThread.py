@@ -3,7 +3,7 @@ import queue
 import os
 
 from src.Logger import Logger
-from src.detector.SymbolDetector import SymbolDetector
+# from src.detector.SymbolDetector import SymbolDetector
 from src.communicator.Arduino import Arduino
 # from src.communicator.Pc import Pc
 # from src.communicator.Android import Android
@@ -28,10 +28,10 @@ class MultiThread:
         self.android = None
         self.arduino = Arduino()
         self.pc = None
-        self.detector = SymbolDetector()
+        # self.detector = SymbolDetector()
 
         # self.android.connect()
-        # self.arduino.connect()
+        self.arduino.connect()
         # self.pc.connect()
 
         self.androidQueue = queue.Queue(maxsize= 0)
@@ -40,14 +40,14 @@ class MultiThread:
 
     def start(self):
         # _thread.start_new_thread(self.readAndroid, ())
-        # _thread.start_new_thread(self.readArduino, ())
+        _thread.start_new_thread(self.readArduino, ())
         # _thread.start_new_thread(self.readPc,())
 
         # _thread.start_new_thread(self.writeAndroid, (self.androidQueue))
         # _thread.start_new_thread(self.writeArduino, (self.arduinoQueue))
         # _thread.start_new_thread(self.writePc, (self.pcQueue))
 
-        _thread.start_new_thread(self.detector.detect, ())
+        # _thread.start_new_thread(self.detector.detect, ())
         log.info('Multithread Communication Session Started')
 
         while True:
@@ -55,9 +55,8 @@ class MultiThread:
 
     def end(self):
         # self.android.disconnect()
-        # self.arduino.disconnect()
         # self.pc.disconnect()
-        self.detector.end()
+        # self.detector.end()
         log.info('Multithread Communication Session Ended')
 
     def readAndroid(self):

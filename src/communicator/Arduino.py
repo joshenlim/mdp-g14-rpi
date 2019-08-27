@@ -9,6 +9,13 @@ log = Logger()
 # Arduino will need an accompanying script to receive the data from Rpi
 # Communication has to be two ways, Rpi send, Arduino receive and reply, Rpi receive
 
+# arduino = Arduino()
+# arduino.connect()
+# arduino.write(msg)
+# while True:
+#     msg = arduino.read()
+#     print(msg)
+
 class Arduino:
     def __init__(self, serial_port=SERIAL_PORT, baud_rate=BAUD_RATE):
         self.serial_port = serial_port
@@ -25,10 +32,9 @@ class Arduino:
         try:
             self.connection = serial.Serial(self.serial_port, self.baud_rate, timeout=3)
             time.sleep(3)
-
             if self.connection is not None:
-                log.info('Successfully connected with Arduino:' + str(self.connection.name))
-                self.read()
+                log.info('Successfully connected with Arduino: ' + str(self.connection.name))
+
         except Exception as error:
             log.error('Connection with Arduino failed: ' + str(error))
 
@@ -41,14 +47,14 @@ class Arduino:
     
     def write(self, msg):
         try:
-            self.connection.write(msg)
+            self.connection.write(str.encode(msg))
             log.info('Successfully wrote message to Arduino')
         except Exception as error:
             log.error('Arduino write failed: ' + str(error))
 
     def read(self):
         try:
-            msg = self.connection.readline()
+            msg = self.connection.readline().strip().decode("UTF-8")
             return msg            
         except Exception as error:
             log.error('Arduino read failed: ' + str(error))
