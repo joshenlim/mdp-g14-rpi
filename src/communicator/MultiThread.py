@@ -20,6 +20,11 @@ it seems to be running really slow at the moment. There's also an occasional
 error: Camera component couldn't be enabled: Out of resources. If hit that error
 just restart the process, wait a little for the resources to be released, then re
 run the main program
+
+Will need to figure out the communication path between devices, hence the queue
+implementations - a message from the PC will have to be passed to the Arduino
+so perhaps, read from PC will be pushed to ArduinoQueue (assuming no preprocessing
+required on rpi side)
 '''
 
 class MultiThread:
@@ -32,7 +37,7 @@ class MultiThread:
 
         # self.android.connect()
         self.arduino.connect()
-        # self.pc.connect()
+        self.pc.connect()
 
         self.androidQueue = queue.Queue(maxsize= 0)
         self.arduinoQueue = queue.Queue(maxsize=0)
@@ -40,7 +45,7 @@ class MultiThread:
 
     def start(self):
         # _thread.start_new_thread(self.readAndroid, ())
-        _thread.start_new_thread(self.readArduino, ())
+        # _thread.start_new_thread(self.readArduino, ())
         # _thread.start_new_thread(self.readPc,())
 
         # _thread.start_new_thread(self.writeAndroid, (self.androidQueue))
@@ -77,6 +82,10 @@ class MultiThread:
             log.info('Read Arduino: ' + str(msg))
 
     def writeArduino(self, arduinoQueue):
+        '''
+        This is assuming that a message will be initially
+        written to the Arduino Queue.
+        '''
         while True:
             if not arduinoQueue.empty():
                 msg = arduinoQueue.get_nowait()

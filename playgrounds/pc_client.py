@@ -4,6 +4,8 @@ import time
 
 '''
 Just note that sending of messages has to be within the same session
+Host on MDP Rpi: 192.168.14.14
+Host on test Rpi: 192.168.3.1
 '''
 
 host = '192.168.3.1'
