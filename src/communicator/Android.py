@@ -13,7 +13,7 @@ class Android():
         
     def connect(self):
         try:
-            log.info('Setting up Bluetooth Connection')
+            log.info('Establishing connection with N7 Tablet')
             self.server_sock = bt.BluetoothSocket(bt.RFCOMM)
 
             self.server_sock.bind(("", RFCOMM_CHANNEL))

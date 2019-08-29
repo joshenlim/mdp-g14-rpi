@@ -28,7 +28,7 @@ class Arduino:
         print('Connection Established: ' + str(self.connection is not None))
 
     def connect(self):
-        log.info('Attempting connection with Arduino')
+        log.info('Establishing connection with Arduino')
         try:
             self.connection = serial.Serial(self.serial_port, self.baud_rate, timeout=3)
             time.sleep(3)

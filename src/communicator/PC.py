@@ -1,14 +1,47 @@
+import socket
+
+from src.config import WIFI_IP
+from src.config import WIFI_PORT
+from src.Logger import Logger
+
+log = Logger()
+
 class PC:
-    def __init__(self):
-        pass
+    def __init__(self, host=WIFI_IP, port=WIFI_PORT):
+        self.host = host
+        self.port = port
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_sock = None
+        self.addres = None
 
     def connect(self):
-        pass
+        log.info('Establishing connection with PC')
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            self.socket.bind((self.host, self.port))
+        except Exception as error:
+            log.error('Connection with PC failed: ' + str(error))
+
+        self.socket.listen(3)
+        self.client_sock, self.address = self.socket.accept()
+        log.info('Successfully connected with PC: ' + str(self.address))
 
     def disconnect(self):
+        try:
+            self.socket.close()
+        except Exception as error:
+            log.error("PC disconnect failed: " + str(error))
 
     def read(self):
-        pass
+        try:
+            msg = self.client_sock.recv(1024)
+            return msg
+        except Exception as error:
+            log.error('PC read failed: ' + str(error))
 
-    def write(self):
-        pass
+    def write(self, msg):
+        try:
+            self.client_sock.sendto(msg, self.address)
+            log.info('Successfully wrote message to PC')
+        except Exception as error:
+            log.error('PC write failed: ' + str(error))

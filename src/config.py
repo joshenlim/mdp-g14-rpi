@@ -7,8 +7,8 @@ N7_MAC_ADDR = ""
 UUID = "00000000-0000-1000-8000-00805F9B34FC"
 
 # PC Wifi connection settings
-WIFI_IP = "192.168.14.14"
-WIFI_PORT = "3090"
+WIFI_IP = "192.168.3.1" # To change to 192.168.14.14
+WIFI_PORT = "3053"
 
 # Arduino USB connection settings
 SERIAL_PORT = "/dev/ttyACM0"
