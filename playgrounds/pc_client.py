@@ -2,6 +2,10 @@ import socket
 import sys
 import time
 
+'''
+Just note that sending of messages has to be within the same session
+'''
+
 host = '192.168.3.1'
 port = 3053
 
