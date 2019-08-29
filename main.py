@@ -1,3 +1,5 @@
+import os
+
 from src.communicator.MultiThread import MultiThread
 # from src.detector.SymbolDetector import SymbolDetector
 from src.Logger import Logger
@@ -5,6 +7,7 @@ from src.Logger import Logger
 log = Logger()
 
 def init():
+    os.system("sudo hciconfig hci0 piscan")
     try:
         multi_thread = MultiThread()
         multi_thread.start()

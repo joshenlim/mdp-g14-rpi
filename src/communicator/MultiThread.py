@@ -5,8 +5,8 @@ import os
 from src.Logger import Logger
 # from src.detector.SymbolDetector import SymbolDetector
 from src.communicator.Arduino import Arduino
-# from src.communicator.Pc import Pc
-# from src.communicator.Android import Android
+from src.communicator.PC import PC
+from src.communicator.Android import Android
 
 log = Logger()
 
@@ -25,9 +25,9 @@ run the main program
 class MultiThread:
     def __init__(self):
         log.info('Initializing Multithread Communication')
-        self.android = None
+        self.android = Android()
         self.arduino = Arduino()
-        self.pc = None
+        self.pc = PC()
         # self.detector = SymbolDetector()
 
         # self.android.connect()

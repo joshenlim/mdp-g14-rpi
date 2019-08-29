@@ -1,8 +1,14 @@
 import os
 
 # Android BT connection settings
+RFCOMM_CHANNEL = 8
+RPI_MAC_ADDR = "B8:27:EB:12:0D:6F"
+N7_MAC_ADDR = ""
+UUID = "00000000-0000-1000-8000-00805F9B34FC"
 
 # PC Wifi connection settings
+WIFI_IP = "192.168.14.14"
+WIFI_PORT = "3090"
 
 # Arduino USB connection settings
 SERIAL_PORT = "/dev/ttyACM0"
