@@ -6,6 +6,16 @@ from src.Logger import Logger
 
 log = Logger()
 
+'''
+PC will need an accompanying (reference available in playgrounds pc_client.py
+PC.connect() will wait for PC to connect before proceeding
+
+pc = PC()
+pc.connect()
+while True:
+    pc.read()
+'''
+
 class PC:
     def __init__(self, host=WIFI_IP, port=WIFI_PORT):
         self.host = host
@@ -34,8 +44,10 @@ class PC:
 
     def read(self):
         try:
-            msg = self.client_sock.recv(1024)
-            return msg
+            msg = self.client_sock.recv(1024).decode()
+            if len(msg) > 0:
+                return msg
+            return None
         except Exception as error:
             log.error('PC read failed: ' + str(error))
 
