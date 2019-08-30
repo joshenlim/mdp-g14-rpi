@@ -9,8 +9,8 @@ class VideoStream:
         self.camera.framerate = framerate
         self.camera.vflip = True
         self.camera.hflip = False
-        self.rawCapture = PiRGBArray(self.camera, size=resolution)
-        self.stream = self.camera.capture_continuous(self.rawCapture, format='bgr', use_video_port=True)
+        self.raw_capture = PiRGBArray(self.camera, size=resolution)
+        self.stream = self.camera.capture_continuous(self.raw_capture, format='bgr', use_video_port=True)
         self.frame = []
         self.stopped = False
 
@@ -21,11 +21,11 @@ class VideoStream:
     def update(self):
         for frame in self.stream:
             self.frame = frame.array
-            self.rawCapture.truncate(0)
+            self.raw_capture.truncate(0)
 
             if self.stopped:
                 self.stream.close()
-                self.rawCapture.close()
+                self.raw_capture.close()
                 self.camera.close()
 
     def read(self):
