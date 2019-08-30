@@ -5,6 +5,23 @@ from src.config import UUID
 
 log = Logger()
 
+'''
+Rapsberry Pi serves as socket server, N7 will need a client socket script
+as well to establish connection. Should be able to send and receive messages
+via the server/client.
+
+TO-DO: Check if Rpi and N7 is server-client or client-client
+
+android = Android()
+android.connect()
+
+import time
+
+while True:
+    android.read()
+    time.sleep(1000)
+'''
+
 class Android():
     def __init__(self):
         self.server_sock = None
@@ -29,7 +46,7 @@ class Android():
             
             log.info('Waiting connection from RFCOMM Channel')
             self.client_sock, address = self.server_sock.accept()
-            log.info("Successfully connected to Android at address: ", str(address))
+            log.info("Successfully connected to Android at address: " + str(address))
 
         except Exception as error:	
             log.error("Connection with Android failed: " + str(error))
@@ -45,7 +62,7 @@ class Android():
       
     def write(self, message):
         try:
-            log.info("sending ", message)
+            log.info("sending " + message)
             self.server_sock.send(message)
         except Exception as error:	
             log.error("Android write failed " + str(error))

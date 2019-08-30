@@ -58,10 +58,3 @@ class PC:
             log.info('Successfully wrote message to PC')
         except Exception as error:
             log.error('PC write failed: ' + str(error))
-
-
-pc = PC()
-pc.connect()
-while True:
-    msg = pc.read()
-    print('Message from PC: ' + str(msg))
