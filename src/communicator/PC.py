@@ -13,7 +13,8 @@ PC.connect() will wait for PC to connect before proceeding
 pc = PC()
 pc.connect()
 while True:
-    pc.read()
+    msg = pc.read()
+    print(msg)
 '''
 
 class PC:
@@ -22,7 +23,7 @@ class PC:
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_sock = None
-        self.addres = None
+        self.address = None
 
     def connect(self):
         log.info('Establishing connection with PC')
@@ -57,3 +58,10 @@ class PC:
             log.info('Successfully wrote message to PC')
         except Exception as error:
             log.error('PC write failed: ' + str(error))
+
+
+pc = PC()
+pc.connect()
+while True:
+    msg = pc.read()
+    print('Message from PC: ' + str(msg))
