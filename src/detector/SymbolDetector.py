@@ -17,7 +17,7 @@ from src.detector.utils import filter_contour_size
 from src.detector.utils import derive_arrow_orientation
 
 from src.detector.VideoStream import VideoStream
-from src.detector.Symbols import load_symbols
+from src.detector.Symbol import load_symbols
 from src.Logger import Logger
 
 log = Logger()

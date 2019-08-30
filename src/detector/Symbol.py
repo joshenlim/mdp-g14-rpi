@@ -4,7 +4,7 @@ import cv2 as cv
 from src.config import SYMBOL_TYPES
 from src.config import SYMBOL_ID_MAP
 
-class Symbols:
+class Symbol:
     '''
     Holds information about the Symbol Images, each symbol image
     will have an image and name
@@ -21,7 +21,7 @@ def load_symbols(filepath):
     '''
     symbols = []
     for i, symbol in enumerate(SYMBOL_TYPES):
-        symbols.append(Symbols())
+        symbols.append(Symbol())
         symbols[i].name = symbol
         symbols[i].id = SYMBOL_ID_MAP[symbol]
         filename = '{}.jpg'.format(symbol)
