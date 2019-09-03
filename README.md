@@ -1,5 +1,5 @@
 # mdp-g14-rpi
-Raspberry Pi Codebase for CZ3004 MDP - Comprises of 2 main functionalites: Multithreaded Communication and Image Recognition
+Raspberry Pi Codebase for CZ3004 MDP
 
 Ensure that OpenCV 3.3.0 is installed
 
