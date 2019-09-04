@@ -29,20 +29,24 @@ except socket.gaierror:
 print('# Connecting to server, ' + host + ' (' + remote_ip + ')')
 s.connect((remote_ip , port))
 
-# Send data to remote server
+# Send initial message
+print('# Sending "A" to remote server')
+msg = "A\n"
+try:
+    s.sendall(msg.encode('utf-8'))
+except socket.error:
+    print ('Send failed')
+    sys.exit()
+
 while True:
-    time.sleep(5)
-    print('# Sending data to server')
-    msg = "Hello from yo\n"
-
-    try:
+    # Check if there's any incoming messages
+    time.sleep(1)
+    msg = s.recv(2014).strip().decode("UTF-8")
+    if msg is not None:
+      print('# Received message: ' + str(msg))
+      reply = chr(ord(msg) + 1)
+      try:
         s.sendall(msg.encode('utf-8'))
-    except socket.error:
-        print ('Send failed')
-        sys.exit()
-
-# Receive data
-# print('# Receive data from server')
-# reply = s.recv(1024)
-
-# print('reply: ' + reply.strip().decode("UTF-8")) 
+      except socket.error:
+          print ('Send failed')
+          sys.exit()
