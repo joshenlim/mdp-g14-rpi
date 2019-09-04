@@ -1,5 +1,7 @@
 import os
 
+LOCALE = "UTF-8"
+
 # Android BT connection settings
 RFCOMM_CHANNEL = 8
 RPI_MAC_ADDR = "B8:27:EB:12:0D:6F"

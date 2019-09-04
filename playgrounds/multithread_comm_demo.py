@@ -10,10 +10,10 @@ log = Logger()
 
 # python3 -m playgrounds.multithread_comm_demo
 
-# 1. Read from 2 sources simultaneuously (x)
-# 2. Pass message from PC to Arduino
-#    a. Arduino must be reading and writing at the same time
-#    b. PC starts by passing an alphabet, Arduino increments it, pass it back
+# Demo connects Rpi with Arduino and PC
+# Connections established in a sequential fashion
+# PC and Arduino will pass alphabets back and forth
+# Incrementing the character whenever either device receives a message
 
 class MultiThread:
     def __init__(self):
@@ -25,14 +25,14 @@ class MultiThread:
         self.pc.connect()
 
         self.arduino_queue = queue.Queue(maxsize=0)
-        # self.pc_queue = queue.Queue(maxsize=0)
+        self.pc_queue = queue.Queue(maxsize=0)
 
     def start(self):
-        _thread.start_new_thread(self.read_arduino, ())
-        _thread.start_new_thread(self.read_pc,())
+        _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
+        _thread.start_new_thread(self.read_pc,(self.arduino_queue,))
 
-        # _thread.start_new_thread(self.write_arduino, (self.arduino_queue))
-        # _thread.start_new_thread(self.write_pc, (self.pc_queue))
+        _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
+        _thread.start_new_thread(self.write_pc, (self.pc_queue,))
 
         log.info('Multithread Communication Session Started')
 
@@ -42,27 +42,26 @@ class MultiThread:
     def end(self):
         log.info('Multithread Communication Session Ended')
 
-    def read_arduino(self):
+    def read_arduino(self, pc_queue):
         while True:
             msg = self.arduino.read()
-            log.info('Read Arduino: ' + str(msg))
+            if msg is not None:
+                log.info('Read Arduino: ' + str(msg))
+                pc_queue.put_nowait(msg)
 
     def write_arduino(self, arduino_queue):
-        '''
-        This is assuming that a message will be initially
-        written to the Arduino Queue.
-        '''
         while True:
             if not arduino_queue.empty():
                 msg = arduino_queue.get_nowait()
                 self.arduino.write(msg)
                 log.info('Write Arduino: ' + str(msg))
 
-    def read_pc(self):
+    def read_pc(self, arduino_queue):
         while True:
             msg = self.pc.read()
             if msg is not None:
                 log.info('Read PC: ' + str(msg))
+                arduino_queue.put_nowait(msg)
 
     def write_pc(self, pc_queue):
         while True:

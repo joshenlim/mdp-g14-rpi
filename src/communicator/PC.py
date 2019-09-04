@@ -2,6 +2,7 @@ import socket
 
 from src.config import WIFI_IP
 from src.config import WIFI_PORT
+from src.config import LOCALE
 from src.Logger import Logger
 
 log = Logger()
@@ -54,7 +55,7 @@ class PC:
 
     def write(self, msg):
         try:
-            self.client_sock.sendto(msg, self.address)
+            self.client_sock.sendto(bytes(msg, LOCALE), self.address)
             log.info('Successfully wrote message to PC')
         except Exception as error:
             log.error('PC write failed: ' + str(error))

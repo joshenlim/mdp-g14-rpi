@@ -48,9 +48,9 @@ class MultiThread:
         # _thread.start_new_thread(self.read_arduino, ())
         # _thread.start_new_thread(self.read_pc,())
 
-        # _thread.start_new_thread(self.write_android, (self.android_queue))
-        # _thread.start_new_thread(self.write_arduino, (self.arduino_queue))
-        # _thread.start_new_thread(self.write_pc, (self.pc_queue))
+        # _thread.start_new_thread(self.write_android, (self.android_queue,))
+        # _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
+        # _thread.start_new_thread(self.write_pc, (self.pc_queue,))
 
         # _thread.start_new_thread(self.detector.detect, ())
         log.info('Multithread Communication Session Started')
@@ -67,7 +67,8 @@ class MultiThread:
     def read_android(self):
         while True:
             msg = self.android.read()
-            log.info('Read Android:' + str(msg))
+            if msg is not None:
+                log.info('Read Android:' + str(msg))
 
     def write_android(self, android_queue):
         while True:
@@ -79,7 +80,8 @@ class MultiThread:
     def read_arduino(self):
         while True:
             msg = self.arduino.read()
-            log.info('Read Arduino: ' + str(msg))
+            if msg is not None:
+                log.info('Read Arduino: ' + str(msg))
 
     def write_arduino(self, arduino_queue):
         '''
@@ -95,7 +97,8 @@ class MultiThread:
     def read_pc(self):
         while True:
             msg = self.pc.read()
-            log.info('Read PC: ' + str(msg))
+            if msg is not None:
+                log.info('Read PC: ' + str(msg))
 
     def write_pc(self, pc_queue):
         while True:

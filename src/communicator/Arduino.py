@@ -3,6 +3,7 @@ import time
 from src.Logger import Logger
 from src.config import SERIAL_PORT
 from src.config import BAUD_RATE
+from src.config import LOCALE
 
 log = Logger()
 
@@ -54,7 +55,9 @@ class Arduino:
 
     def read(self):
         try:
-            msg = self.connection.readline().strip().decode("UTF-8")
-            return msg            
+            msg = self.connection.readline().strip().decode(LOCALE)
+            if len(msg) > 0:
+                return msg
+            return None          
         except Exception as error:
             log.error('Arduino read failed: ' + str(error))
