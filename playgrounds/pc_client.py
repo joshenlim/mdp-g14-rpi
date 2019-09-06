@@ -8,7 +8,7 @@ Host on MDP Rpi: 192.168.14.14
 Host on test Rpi: 192.168.3.1
 '''
 
-host = '192.168.3.1'
+host = '192.168.14.14'
 port = 3053
 
 print('# Creating socket')
