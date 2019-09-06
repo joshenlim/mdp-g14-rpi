@@ -13,7 +13,7 @@ UUID = "00000000-0000-1000-8000-00805F9B34FC"
 # PC Wifi connection settings
 # raspberryHotPotato: 192.168.3.1
 # MDPGrp14: 192.168.14.14
-WIFI_IP = "192.168.3.1"
+WIFI_IP = "192.168.14.14"
 WIFI_PORT = 3053
 
 # Arduino USB connection settings
