@@ -2,6 +2,7 @@ import bluetooth as bt
 from src.Logger import Logger
 from src.config import RFCOMM_CHANNEL
 from src.config import UUID
+from src.config import LOCALE
 
 log = Logger()
 
@@ -55,15 +56,17 @@ class Android():
         
     def read(self):
         try:
-            data = self.client_sock.recv(1024)
-            log.info("received [%s]" % data)
+            msg = self.client_sock.recv(1024).decode(LOCALE)
+            if len(msg) > 0:
+                return msg
+            return None
         except Exception as error:	
             log.error("Android read failed: " + str(error))
       
     def write(self, message):
         try:
-            log.info("sending " + message)
-            self.server_sock.send(message)
+            self.client_sock.send(message)
+            log.info('Successfully wrote message to Arduino')
         except Exception as error:	
             log.error("Android write failed " + str(error))
 

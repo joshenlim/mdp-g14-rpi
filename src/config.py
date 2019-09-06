@@ -4,13 +4,15 @@ LOCALE = "UTF-8"
 
 # Android BT connection settings
 RFCOMM_CHANNEL = 8
+# raspberryHotPotato: B8:27:EB:14:A1:9C
+# MDPGrp14: B8:27:EB:12:0D:6F
 RPI_MAC_ADDR = "B8:27:EB:12:0D:6F"
 N7_MAC_ADDR = ""
 UUID = "00000000-0000-1000-8000-00805F9B34FC"
 
 # PC Wifi connection settings
-# To change to 192.168.3.1 for raspberryHotPotato
-# To change to 192.168.14.14 for MDPGrp14
+# raspberryHotPotato: 192.168.3.1
+# MDPGrp14: 192.168.14.14
 WIFI_IP = "192.168.3.1"
 WIFI_PORT = 3053
 
