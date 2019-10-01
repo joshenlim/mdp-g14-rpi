@@ -66,7 +66,7 @@ class Android():
     def write(self, message):
         try:
             self.client_sock.send(message)
-            log.info('Successfully wrote message to Arduino')
+            log.info('Successfully wrote message to Android')
         except Exception as error:	
             log.error("Android write failed " + str(error))
 
