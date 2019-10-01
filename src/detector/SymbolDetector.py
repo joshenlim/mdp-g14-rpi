@@ -32,11 +32,15 @@ class SymbolDetector:
         self.match_count = 0
         self.cam_quit = 0
 
-    def detect(self):
+    def start(self):
         self.video_stream.start()
         time.sleep(3)
         log.info('Detecting for Symbols')
-        while self.cam_quit == 0:
+
+    def get_frame(self):
+        return self.video_stream.read()
+
+    def detect(self, image):
             image = self.video_stream.read()
             pre_proc_frame = preprocess_frame(image)
 

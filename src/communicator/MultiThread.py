@@ -64,8 +64,7 @@ class MultiThread:
             pass
 
     def end(self):
-        # self.detector.end()
-        self.test_video.stop()
+        self.detector.end()
         log.info('Multithread Communication Session Ended')
 
     def read_android(self, android_queue):
@@ -111,5 +110,6 @@ class MultiThread:
                 log.info('Write PC: ' + str(msg))
 
     def detect_symbols(self):
+        self.detector.start()
         self.detector.detect()
                     
