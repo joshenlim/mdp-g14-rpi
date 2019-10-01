@@ -10,7 +10,6 @@ class Symbol:
     will have an image and name
     '''
     def __init__(self):
-        self.img = []
         self.id = 0
         self.name = ''
         self.contour = None
@@ -26,9 +25,9 @@ def load_symbols(filepath):
         symbols[i].name = symbol
         symbols[i].id = SYMBOL_ID_MAP[symbol]
         filename = '{}.jpg'.format(symbol)
-        symbols[i].img = cv.imread(filepath + '/' + filename)
-
-        train_symbol_gray = cv.cvtColor(symbols[i].img, cv.COLOR_BGR2GRAY)
+        
+        symbol_img = cv.imread(filepath + '/' + filename)
+        train_symbol_gray = cv.cvtColor(symbol_img, cv.COLOR_BGR2GRAY)
         _, train_symbol_thresh = cv.threshold(train_symbol_gray, 127, 255, 0)
         _, train_symbol_ctrs, _ = cv.findContours(train_symbol_thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
         train_symbol_ctrs = sorted(train_symbol_ctrs, key=cv.contourArea, reverse=True)

@@ -35,7 +35,7 @@ class SymbolDetector:
     def start(self):
         self.video_stream.start()
         time.sleep(3)
-        log.info('Detecting for Symbols')    
+        log.info('Starting Video Stream')    
 
     def get_frame(self):
         return self.video_stream.read()
@@ -66,16 +66,12 @@ class SymbolDetector:
                 match_score = cv.matchShapes(symbol_contour, train_symbol.contour, 1, 0.0)
                 match_results.append({
                     'score': match_score,
-                    'contour': symbol_contour,
                     'symbol': train_symbol.name,
-                    'img': train_symbol.img,
                     'id': train_symbol.id
                 })
 
             closest_match = min(match_results, key=lambda x: x['score'])
             if closest_match['score'] < MATCH_THRESHOLD:
-                # cv.imshow('Matching Symbol', closest_match['img'])
-
                 # If detected arrow, further derive arrow orientation
                 if closest_match['id'] == 0:
                     # Uncomment if debugging for arrow detection
@@ -101,9 +97,8 @@ class SymbolDetector:
                 if self.match_symbol_id == closest_match['id']:
                     self.match_count = self.match_count + 1
                     if (self.match_count == MATCH_CONFIDENCE_COUNT):
-                        # TO-DO: Ping to PC/N7 about the detected Symbol's ID
-                        # log.info('Found: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']))
                         return(closest_match['id'])
+                    
                 else:
                     self.match_symbol_id = closest_match['id']
                     self.match_count = 1
