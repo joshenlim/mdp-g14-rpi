@@ -23,7 +23,7 @@ BAUD_RATE = 115200
 # Image Recognition Settings
 CAMERA_RES_WIDTH = 540
 CAMERA_RES_HEIGHT = 480
-CAMERA_FRAMERATE = 30
+CAMERA_FRAMERATE = 32
 
 MIN_CONTOUR_AREA = 1800 # Assuming at a distance of 20 - 25cm
 MAX_CONTOUR_AREA = 6800 # Assuming min distance of 10 - 15cm

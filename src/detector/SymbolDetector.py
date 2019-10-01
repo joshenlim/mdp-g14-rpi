@@ -35,7 +35,7 @@ class SymbolDetector:
     def start(self):
         self.video_stream.start()
         time.sleep(3)
-        log.info('Detecting for Symbols')
+        log.info('Detecting for Symbols')    
 
     def get_frame(self):
         return self.video_stream.read()
@@ -63,13 +63,7 @@ class SymbolDetector:
 
             match_results = []
             for train_symbol in self.train_symbols:
-                train_symbol_gray = cv.cvtColor(train_symbol.img, cv.COLOR_BGR2GRAY)
-                _, train_symbol_thresh = cv.threshold(train_symbol_gray, 127, 255, 0)
-                _, train_symbol_ctrs, _ = cv.findContours(train_symbol_thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-                train_symbol_ctrs = sorted(train_symbol_ctrs, key=cv.contourArea, reverse=True)
-                train_symbol_ctr = train_symbol_ctrs[0]
-        
-                match_score = cv.matchShapes(symbol_contour, train_symbol_ctr, 1, 0.0)
+                match_score = cv.matchShapes(symbol_contour, train_symbol.contour, 1, 0.0)
                 match_results.append({
                     'score': match_score,
                     'contour': symbol_contour,
