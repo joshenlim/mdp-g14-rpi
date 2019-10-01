@@ -40,6 +40,7 @@ class MultiThread:
         # self.android.connect()
         # self.arduino.connect()
         # self.pc.connect()
+        self.detector.start()
 
         self.android_queue = queue.Queue(maxsize= 0)
         self.arduino_queue = queue.Queue(maxsize=0)
@@ -110,6 +111,10 @@ class MultiThread:
                 log.info('Write PC: ' + str(msg))
 
     def detect_symbols(self):
-        self.detector.start()
-        self.detector.detect()
+        while True:
+            frame = self.detector.get_frame()
+            symbol_match = self.detector.detect(frame)
+            if symbol_match is not None:
+                # Push to queue
+                print('Symbol Match ID: ' + str(symbol_match))
                     

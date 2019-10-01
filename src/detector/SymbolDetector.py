@@ -41,7 +41,6 @@ class SymbolDetector:
         return self.video_stream.read()
 
     def detect(self, image):
-        image = self.video_stream.read()
         pre_proc_frame = preprocess_frame(image)
 
         # Uncomment if debugging threshold value
@@ -109,7 +108,8 @@ class SymbolDetector:
                     self.match_count = self.match_count + 1
                     if (self.match_count == MATCH_CONFIDENCE_COUNT):
                         # TO-DO: Ping to PC/N7 about the detected Symbol's ID
-                        log.info('Found: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']))
+                        # log.info('Found: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']))
+                        return(closest_match['id'])
                 else:
                     self.match_symbol_id = closest_match['id']
                     self.match_count = 1
