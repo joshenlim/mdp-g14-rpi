@@ -61,14 +61,14 @@ class Android():
                 return msg
             return None
         except Exception as error:	
-            log.error("Android read failed: " + str(error))
+            raise
       
     def write(self, message):
         try:
             self.client_sock.send(message)
-            log.info('Successfully wrote message to Arduino')
+            log.info('Successfully wrote message to Android')
         except Exception as error:	
-            log.error("Android write failed " + str(error))
+            raise
 
     def disconnect(self):
         try:

@@ -32,89 +32,82 @@ class SymbolDetector:
         self.match_count = 0
         self.cam_quit = 0
 
-    def detect(self):
+    def start(self):
         self.video_stream.start()
         time.sleep(3)
-        log.info('Detecting for Symbols')
-        while self.cam_quit == 0:
-            image = self.video_stream.read()
-            pre_proc_frame = preprocess_frame(image)
+        log.info('Starting Video Stream')    
 
-            # Uncomment if debugging threshold value
-            # cv.imshow('Frame Thresh', pre_proc_frame)
+    def get_frame(self):
+        return self.video_stream.read()
+
+    def detect(self, image):
+        pre_proc_frame = preprocess_frame(image)
+
+        # Uncomment if debugging threshold value
+        # cv.imshow('Frame Thresh', pre_proc_frame)
+        
+        _, contours, hierarchy = cv.findContours(pre_proc_frame, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=cv.contourArea, reverse=True)
+        filtered_contours = filter_contour_size(contours)
+        cv.drawContours(image, filtered_contours, -1, (255, 0, 0), 3)
+
+        if len(filtered_contours) > 0:
+            symbol_contour = filtered_contours[0]
             
-            _, contours, hierarchy = cv.findContours(pre_proc_frame, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-            contours = sorted(contours, key=cv.contourArea, reverse=True)
-            filtered_contours = filter_contour_size(contours)
-            cv.drawContours(image, filtered_contours, -1, (255, 0, 0), 3)
+            x, y, w, h = cv.boundingRect(symbol_contour)
+            cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-            if len(filtered_contours) > 0:
-                symbol_contour = filtered_contours[0]
-                
-                x, y, w, h = cv.boundingRect(symbol_contour)
-                cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            extLeft, extTop, extRight, extBottom = extract_extreme_points(symbol_contour)
+            symbol_thresh = extract_detected_symbol_thresh(image, extLeft, extTop, extRight, extBottom)
+            # cv.imshow("Detected Object", symbol_thresh)
 
-                extLeft, extTop, extRight, extBottom = extract_extreme_points(symbol_contour)
-                symbol_thresh = extract_detected_symbol_thresh(image, extLeft, extTop, extRight, extBottom)
-                # cv.imshow("Detected Object", symbol_thresh)
+            match_results = []
+            for train_symbol in self.train_symbols:
+                match_score = cv.matchShapes(symbol_contour, train_symbol.contour, 1, 0.0)
+                match_results.append({
+                    'score': match_score,
+                    'symbol': train_symbol.name,
+                    'id': train_symbol.id
+                })
 
-                match_results = []
-                for train_symbol in self.train_symbols:
-                    train_symbol_gray = cv.cvtColor(train_symbol.img, cv.COLOR_BGR2GRAY)
-                    _, train_symbol_thresh = cv.threshold(train_symbol_gray, 127, 255, 0)
-                    _, train_symbol_ctrs, _ = cv.findContours(train_symbol_thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-                    train_symbol_ctrs = sorted(train_symbol_ctrs, key=cv.contourArea, reverse=True)
-                    train_symbol_ctr = train_symbol_ctrs[0]
-            
-                    match_score = cv.matchShapes(symbol_contour, train_symbol_ctr, 1, 0.0)
-                    match_results.append({
-                        'score': match_score,
-                        'contour': symbol_contour,
-                        'symbol': train_symbol.name,
-                        'img': train_symbol.img,
-                        'id': train_symbol.id
-                    })
+            closest_match = min(match_results, key=lambda x: x['score'])
+            if closest_match['score'] < MATCH_THRESHOLD:
+                # If detected arrow, further derive arrow orientation
+                if closest_match['id'] == 0:
+                    # Uncomment if debugging for arrow detection
+                    # cv.circle(image, (extLeft[0], extLeft[1]), 8, (0, 0, 255), 2)
+                    # cv.circle(image, (extTop[0], extTop[1]), 8, (0, 0, 255), 2)
+                    # cv.circle(image, (extRight[0], extRight[1]), 8, (0, 0, 255), 2)
+                    # cv.circle(image, (extBottom[0], extBottom[1]), 8, (0, 0, 255), 2)
+                    # cv.circle(image, (int(((extLeft[0] + extRight[0]) / 2)), int(((extTop[1] + extBottom[1]) / 2))), 8, (0, 0, 255), 2)
 
-                closest_match = min(match_results, key=lambda x: x['score'])
-                if closest_match['score'] < MATCH_THRESHOLD:
-                    # cv.imshow('Matching Symbol', closest_match['img'])
+                    arrow_name, arrow_id = derive_arrow_orientation(extLeft, extTop, extRight, extBottom)
+                    closest_match['symbol'] = arrow_name
+                    closest_match['id'] = arrow_id
+                    
+                cv.putText(
+                    image,
+                    'Symbol: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']),
+                    (extLeft[0] - 50, extTop[1] - 20),
+                    font,
+                    0.8,
+                    (0, 255, 0)
+                )
 
-                    # If detected arrow, further derive arrow orientation
-                    if closest_match['id'] == 0:
-                        # Uncomment if debugging for arrow detection
-                        # cv.circle(image, (extLeft[0], extLeft[1]), 8, (0, 0, 255), 2)
-                        # cv.circle(image, (extTop[0], extTop[1]), 8, (0, 0, 255), 2)
-                        # cv.circle(image, (extRight[0], extRight[1]), 8, (0, 0, 255), 2)
-                        # cv.circle(image, (extBottom[0], extBottom[1]), 8, (0, 0, 255), 2)
-                        # cv.circle(image, (int(((extLeft[0] + extRight[0]) / 2)), int(((extTop[1] + extBottom[1]) / 2))), 8, (0, 0, 255), 2)
-
-                        arrow_name, arrow_id = derive_arrow_orientation(extLeft, extTop, extRight, extBottom)
-                        closest_match['symbol'] = arrow_name
-                        closest_match['id'] = arrow_id
-                        
-                    cv.putText(
-                        image,
-                        'Symbol: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']),
-                        (extLeft[0] - 50, extTop[1] - 20),
-                        font,
-                        0.8,
-                        (0, 255, 0)
-                    )
-
-                    if self.match_symbol_id == closest_match['id']:
-                        self.match_count = self.match_count + 1
-                        if (self.match_count == MATCH_CONFIDENCE_COUNT):
-                            # TO-DO: Ping to PC/N7 about the detected Symbol's ID
-                            log.info('Found: ' + str(closest_match['symbol']) + '; ID: ' + str(closest_match['id']))
-                    else:
-                        self.match_symbol_id = closest_match['id']
-                        self.match_count = 1
+                if self.match_symbol_id == closest_match['id']:
+                    self.match_count = self.match_count + 1
+                    if (self.match_count == MATCH_CONFIDENCE_COUNT):
+                        return(closest_match['id'])
+                    
                 else:
-                    self.match_symbol_id = None
-                    self.match_count = 0
+                    self.match_symbol_id = closest_match['id']
+                    self.match_count = 1
+            else:
+                self.match_symbol_id = None
+                self.match_count = 0
 
-            cv.imshow("Video Stream", image)
-            key = cv.waitKey(1) & 0xFF
+        cv.imshow("Video Stream", image)
+        key = cv.waitKey(1) & 0xFF
 
     def end(self):
         self.cam_quit = 1

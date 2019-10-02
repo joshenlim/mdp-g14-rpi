@@ -1,9 +1,11 @@
 import _thread
 import queue
 import os
+import cv2 as cv
+import time
 
 from src.Logger import Logger
-# from src.detector.SymbolDetector import SymbolDetector
+from src.detector.SymbolDetector import SymbolDetector
 from src.communicator.Arduino import Arduino
 from src.communicator.PC import PC
 from src.communicator.Android import Android
@@ -20,11 +22,6 @@ it seems to be running really slow at the moment. There's also an occasional
 error: Camera component couldn't be enabled: Out of resources. If hit that error
 just restart the process, wait a little for the resources to be released, then re
 run the main program
-
-Will need to figure out the communication path between devices, hence the queue
-implementations - a message from the PC will have to be passed to the Arduino
-so perhaps, read from PC will be pushed to ArduinoQueue (assuming no preprocessing
-required on rpi side)
 '''
 
 class MultiThread:
@@ -33,10 +30,10 @@ class MultiThread:
         self.android = Android()
         self.arduino = Arduino()
         self.pc = PC()
-        # self.detector = SymbolDetector()
+        self.detector = SymbolDetector()
 
         self.android.connect()
-        self.arduino.connect()
+        # self.arduino.connect()
         self.pc.connect()
 
         self.android_queue = queue.Queue(maxsize= 0)
@@ -44,17 +41,17 @@ class MultiThread:
         self.pc_queue = queue.Queue(maxsize=0)
 
     def start(self):
-        # Currently configured to pass messages between android and PC
-        # And read write to and fro android
-        _thread.start_new_thread(self.read_android, (self.android_queue,))
-        _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
-        _thread.start_new_thread(self.read_pc,(self.arduino_queue,))
+        self.detector.start()
+        
+        _thread.start_new_thread(self.read_android, (self.pc_queue,))
+        # _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
+        _thread.start_new_thread(self.read_pc,(self.android_queue,))
 
         _thread.start_new_thread(self.write_android, (self.android_queue,))
-        _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
+        # _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
         _thread.start_new_thread(self.write_pc, (self.pc_queue,))
 
-        # _thread.start_new_thread(self.detector.detect, ())
+        # _thread.start_new_thread(self.detect_symbols, ())
 
         log.info('Multithread Communication Session Started')
 
@@ -62,22 +59,30 @@ class MultiThread:
             pass
 
     def end(self):
-        # self.detector.end()
+        self.detector.end()
         log.info('Multithread Communication Session Ended')
 
-    def read_android(self, android_queue):
+    def read_android(self, pc_queue):
         while True:
-            msg = self.android.read()
-            if msg is not None:
-                log.info('Read Android:' + str(msg))
-                android_queue.put_nowait('Hello from PC: ' + str(msg))
+            try:
+                msg = self.android.read()
+                if msg is not None:
+                    log.info('Read Android:' + str(msg))
+                    pc_queue.put_nowait(msg)
+            except Exception as e:
+                log.error("Android read failed: " + str(error))
+                self.android.connect()
 
     def write_android(self, android_queue):
         while True:
             if not android_queue.empty():
-                msg = android_queue.get_nowait()
-                self.android.write(msg)
-                log.info('Write Android: ' + str(msg))
+                try:
+                    msg = android_queue.get_nowait()
+                    self.android.write(msg)
+                    log.info('Write Android: ' + str(msg))
+                except Exception as e:
+                    log.error("Android write failed " + str(error))
+                    self.android.connect()
 
     def read_arduino(self, pc_queue):
         while True:
@@ -93,12 +98,12 @@ class MultiThread:
                 self.arduino.write(msg)
                 log.info('Write Arduino: ' + str(msg))
 
-    def read_pc(self, arduino_queue):
+    def read_pc(self, android_queue):
         while True:
             msg = self.pc.read()
             if msg is not None:
                 log.info('Read PC: ' + str(msg))
-                arduino_queue.put_nowait(msg)
+                android_queue.put_nowait(msg)
 
     def write_pc(self, pc_queue):
         while True:
@@ -106,3 +111,12 @@ class MultiThread:
                 msg = pc_queue.get_nowait()
                 self.pc.write(msg)
                 log.info('Write PC: ' + str(msg))
+
+    def detect_symbols(self):
+        while True:
+            frame = self.detector.get_frame()
+            symbol_match = self.detector.detect(frame)
+            if symbol_match is not None:
+                # Push to queue
+                print('Symbol Match ID: ' + str(symbol_match))
+                    

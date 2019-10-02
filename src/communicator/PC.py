@@ -46,7 +46,7 @@ class PC:
 
     def read(self):
         try:
-            msg = self.client_sock.recv(1024).decode()
+            msg = self.client_sock.recv(2048).decode()
             if len(msg) > 0:
                 return msg
             return None
