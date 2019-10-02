@@ -14,7 +14,6 @@ def fpParser(path_data):
 
     path_seq = path_data.split(";")
     init_x, init_y, init_direction = path_seq[0][slice(1, len(path_seq[0]) - 1)].split(',')
-    print(init_x, init_y, init_direction)
 
     for index, path in enumerate(path_seq):
         x_1, y_1, direction_1 = path[slice(1, len(path) - 1)].split(',')

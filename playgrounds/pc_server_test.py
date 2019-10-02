@@ -11,7 +11,11 @@ pc.connect()
 
 
 while True:
-    msg = pc.read()
-    if msg is not None:
-        print('Message from PC:' + str(msg))
-        #android.write(msg)
+    try:
+        msg = pc.read()
+        if msg is not None:
+            msg = msg.strip()
+            print('Message from PC: ' + msg)
+            # pc.write('B')
+    except Exception as e:
+        print(e)
