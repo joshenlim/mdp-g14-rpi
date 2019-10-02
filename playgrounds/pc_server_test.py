@@ -8,8 +8,11 @@ import time
 pc = PC()
 pc.connect()
 
+while True:
+    pc.write('SUPP\n')
+    time.sleep(1)
 
-
+'''
 while True:
     try:
         msg = pc.read()
@@ -19,3 +22,4 @@ while True:
             # pc.write('B')
     except Exception as e:
         print(e)
+'''

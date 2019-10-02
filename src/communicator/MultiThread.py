@@ -45,13 +45,13 @@ class MultiThread:
         
         _thread.start_new_thread(self.read_android, (self.pc_queue,))
         # _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
-        _thread.start_new_thread(self.read_pc,(self.android_queue,))
+        _thread.start_new_thread(self.read_pc,(self.android_queue, self.arduino_queue,))
 
         _thread.start_new_thread(self.write_android, (self.android_queue,))
         # _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
         _thread.start_new_thread(self.write_pc, (self.pc_queue,))
 
-        # _thread.start_new_thread(self.detect_symbols, ())
+        # _thread.start_new_thread(self.detect_symbols, (self.android_queue,))
 
         log.info('Multithread Communication Session Started')
 
@@ -70,7 +70,7 @@ class MultiThread:
                     log.info('Read Android:' + str(msg))
                     pc_queue.put_nowait(msg)
             except Exception as e:
-                log.error("Android read failed: " + str(error))
+                log.error("Android read failed: " + str(e))
                 self.android.connect()
 
     def write_android(self, android_queue):
@@ -79,9 +79,9 @@ class MultiThread:
                 try:
                     msg = android_queue.get_nowait()
                     self.android.write(msg)
-                    log.info('Write Android: ' + str(msg))
+                    # log.info('Write Android: ' + str(msg))
                 except Exception as e:
-                    log.error("Android write failed " + str(error))
+                    log.error("Android write failed " + str(e))
                     self.android.connect()
 
     def read_arduino(self, pc_queue):
@@ -98,12 +98,18 @@ class MultiThread:
                 self.arduino.write(msg)
                 log.info('Write Arduino: ' + str(msg))
 
-    def read_pc(self, android_queue):
+    def read_pc(self, android_queue, arduino_queue):
         while True:
             msg = self.pc.read()
             if msg is not None:
-                log.info('Read PC: ' + str(msg))
-                android_queue.put_nowait(msg)
+                log.info('Read PC: ' + str(msg['target']) + '; ' + str(msg['payload']))
+                if msg['target'] == 'android':
+                    android_queue.put_nowait(msg['payload'])
+                elif msg['target'] == 'arduino':
+                    arduino_queue.put_nowait(msg['payload'])
+                elif msg['target'] == 'both':
+                    android_queue.put_nowait(msg['payload']['android'])
+                    arduino_queue.put_nowait(msg['payload']['arduino'])
 
     def write_pc(self, pc_queue):
         while True:
@@ -112,11 +118,11 @@ class MultiThread:
                 self.pc.write(msg)
                 log.info('Write PC: ' + str(msg))
 
-    def detect_symbols(self):
+    def detect_symbols(self, android_queue):
         while True:
             frame = self.detector.get_frame()
             symbol_match = self.detector.detect(frame)
             if symbol_match is not None:
-                # Push to queue
                 print('Symbol Match ID: ' + str(symbol_match))
+                android_queue.put_nowait('SID|' + str(symbol_match))
                     

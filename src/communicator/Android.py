@@ -66,7 +66,7 @@ class Android():
     def write(self, message):
         try:
             self.client_sock.send(message)
-            log.info('Successfully wrote message to Android')
+            log.info('Successfully wrote to Android: ' + str(message))
         except Exception as error:	
             raise
 
