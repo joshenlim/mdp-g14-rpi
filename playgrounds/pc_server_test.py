@@ -9,17 +9,11 @@ pc = PC()
 pc.connect()
 
 while True:
-    pc.write('SUPP\n')
-    time.sleep(1)
-
-'''
-while True:
     try:
         msg = pc.read()
         if msg is not None:
-            msg = msg.strip()
-            print('Message from PC: ' + msg)
-            # pc.write('B')
+            print('Message from PC: ' + str(msg))
+            time.sleep(0.1)
+            pc.write('MC')
     except Exception as e:
         print(e)
-'''

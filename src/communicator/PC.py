@@ -57,6 +57,6 @@ class PC:
     def write(self, msg):
         try:
             self.client_sock.sendto(bytes(msg + '\n', LOCALE), self.address)
-            log.info('Successfully wrote message to PC')
+            # log.info('Successfully wrote message to PC')
         except Exception as error:
             log.error('PC write failed: ' + str(error))
