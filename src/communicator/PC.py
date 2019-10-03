@@ -4,6 +4,7 @@ from src.config import WIFI_IP
 from src.config import WIFI_PORT
 from src.config import LOCALE
 from src.Logger import Logger
+from src.communicator.utils import pcMsgParser
 
 log = Logger()
 
@@ -46,16 +47,16 @@ class PC:
 
     def read(self):
         try:
-            msg = self.client_sock.recv(2048).decode()
+            msg = self.client_sock.recv(2048).decode().strip()
             if len(msg) > 0:
-                return msg
+                return pcMsgParser(msg)
             return None
         except Exception as error:
             log.error('PC read failed: ' + str(error))
 
     def write(self, msg):
         try:
-            self.client_sock.sendto(bytes(msg, LOCALE), self.address)
+            self.client_sock.sendto(bytes(msg + '\n', LOCALE), self.address)
             log.info('Successfully wrote message to PC')
         except Exception as error:
             log.error('PC write failed: ' + str(error))
