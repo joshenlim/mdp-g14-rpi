@@ -2,7 +2,6 @@ import argparse
 
 from src.communicator.utils import fpParser
 from src.communicator.utils import pcMsgParser
-from src.communicator.System import System
 from src.Logger import Logger
 
 log = Logger()
@@ -46,7 +45,7 @@ def runTests(verbose):
         pc_msg = pcMsgParser(msg_read)
         assert pc_msg['target'] == 'both'
         assert pc_msg['payload']['android'] == 'FP|1|1|N|f,tr,tr,tr,tr,tr,tr,tr,tr,tr,tr,tr,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,tl,r'
-        assert pc_msg['payload']['arduino'] == 'w1dw11aw17aw1'
+        assert pc_msg['payload']['arduino'] == 'w1dw9w2aw9w8aw1'
         if verbose:
             log.info('Msg to parse: ' + msg_read)
             log.info('Parsed Android: ' + pc_msg['payload']['android'])

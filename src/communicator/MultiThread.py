@@ -33,7 +33,7 @@ class MultiThread:
         self.detector = SymbolDetector()
 
         self.android.connect()
-        # self.arduino.connect()
+        self.arduino.connect()
         self.pc.connect()
 
         self.android_queue = queue.Queue(maxsize= 0)
@@ -44,11 +44,11 @@ class MultiThread:
         self.detector.start()
         
         _thread.start_new_thread(self.read_android, (self.pc_queue,))
-        # _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
+        _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
         _thread.start_new_thread(self.read_pc,(self.android_queue, self.arduino_queue,))
 
         _thread.start_new_thread(self.write_android, (self.android_queue,))
-        # _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
+        _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
         _thread.start_new_thread(self.write_pc, (self.pc_queue,))
 
         # _thread.start_new_thread(self.detect_symbols, (self.android_queue,))

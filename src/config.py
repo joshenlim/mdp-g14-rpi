@@ -18,7 +18,7 @@ WIFI_PORT = 3053
 
 # Arduino USB connection settings
 SERIAL_PORT = "/dev/ttyACM0"
-BAUD_RATE = 115200
+BAUD_RATE = 9600
 
 # Image Recognition Settings
 CAMERA_RES_WIDTH = 540

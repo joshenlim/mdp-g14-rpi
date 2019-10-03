@@ -114,6 +114,9 @@ def compressStepSeq(step_seq):
     for step in step_seq:
         if step == 'w':
             forward_count = forward_count + 1
+            if forward_count == 9:
+                seq.append('w{x}'.format(x=forward_count))
+                forward_count = 0
         else:
             seq.append('w{x}'.format(x=forward_count))
             seq.append(step)
