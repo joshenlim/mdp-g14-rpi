@@ -20,7 +20,11 @@ def pcMsgParser(msg):
         }
 
     elif command == 'MDF':
-        target = 'android'
+        target = 'both'
+        payload = {
+            'android': mdfParser('android', msg),
+            'arduino': mdfParser('arduino', msg),
+        }
 
     elif command == 'EC':
         target = 'both'
@@ -37,6 +41,17 @@ def pcMsgParser(msg):
         'target': target,
         'payload': payload
     }
+
+'''
+Parse MDP message from PC to a format consumable by
+Android or Arduino
+'''
+def mdfParser(system, mdf_string):
+    mdf_data = mdf_string.split('|')
+    if system == 'android':
+        return '|'.join(mdf_data[0 : len(mdf_data) - 1])
+    if system == 'arduino':
+        return mdf_data[len(mdf_data) - 1]
 
 '''
 Parse FP message from PC to a format consumable by

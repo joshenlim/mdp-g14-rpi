@@ -31,10 +31,15 @@ def runTests(verbose):
         log.info('pcMsgParser: Unknown Command  - Failed!')
 
     try:
-        msg_read = 'MDF|ffffffffffffffffffffffffffffdfffbfff7ffefffdfffbffffffffffffffffffffffffffff|00000000000000000000000000000000000000000000000000000000000000000000000000|S|1|1|0'
+        msg_read = 'MDF|ffffffffffffffffffffffffffffdfffbfff7ffefffdfffbffffffffffffffffffffffffffff|00000000000000000000000000000000000000000000000000000000000000000000000000|S|1|1|0|w1'
         pc_msg = pcMsgParser(msg_read)
-        assert pc_msg['target'] == 'android'
-        assert pc_msg['payload'] == msg_read
+        assert pc_msg['target'] == 'both'
+        assert pc_msg['payload']['android'] == 'MDF|ffffffffffffffffffffffffffffdfffbfff7ffefffdfffbffffffffffffffffffffffffffff|00000000000000000000000000000000000000000000000000000000000000000000000000|S|1|1|0'
+        assert pc_msg['payload']['arduino'] == 'w1'
+        if verbose:
+            log.info('Msg to parse: ' + msg_read)
+            log.info('Parsed Android: ' + pc_msg['payload']['android'])
+            log.info('Parsed Arduino: ' + pc_msg['payload']['arduino'])
         log.info('pcMsgParser: MDF - Passed!')
     except AssertionError as e:
         all_passed = False
