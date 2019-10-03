@@ -30,23 +30,24 @@ print('# Connecting to server, ' + host + ' (' + remote_ip + ')')
 s.connect((remote_ip , port))
 
 # Send initial message
-print('# Sending "A" to remote server')
-msg = "A\n"
-try:
-    s.sendall(msg.encode('utf-8'))
-except socket.error:
-    print ('Send failed')
-    sys.exit()
+# print('# Sending "A" to remote server')
+# msg = "A\n"
+# try:
+#     s.sendall(msg.encode('utf-8'))
+# except socket.error:
+#     print ('Send failed')
+#     sys.exit()
 
 while True:
+    pass
     # Check if there's any incoming messages
-    time.sleep(1)
-    msg = s.recv(2014).strip().decode("UTF-8")
-    if msg is not None:
-      print('# Received message: ' + str(msg))
-      reply = chr(ord(msg) + 1)
-      try:
-        s.sendall(msg.encode('utf-8'))
-      except socket.error:
-          print ('Send failed')
-          sys.exit()
+    # time.sleep(1)
+    # msg = s.recv(2014).strip().decode("UTF-8")
+    # if msg is not None:
+    #   print('# Received message: ' + str(msg))
+    #   reply = chr(ord(msg) + 1)
+    #   try:
+    #     s.sendall(msg.encode('utf-8'))
+    #   except socket.error:
+    #       print ('Send failed')
+    #       sys.exit()
