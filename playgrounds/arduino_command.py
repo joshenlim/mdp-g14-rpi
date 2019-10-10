@@ -10,6 +10,12 @@ pc_msg = pcMsgParser(msg_read)
 print(pc_msg)
 
 while True:
+    try:
+        msg = arduino.read()
+        if msg is not None:
+            print(msg)
+    except Exception as e:
+        pass
     command = input("Enter command to send to Arduino:")
     if command == 'demo':
         print('Init demo')

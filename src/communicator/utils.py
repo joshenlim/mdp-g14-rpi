@@ -1,6 +1,20 @@
 from src.Logger import Logger
 log = Logger()
 
+arduino_commands = ['H', 'F', 'S']
+arduino_out = ['SD', 'MC', 'CC', 'EC']
+
+'''
+Parse messages received from Arduino, essentially filters out
+unnecessary messages
+'''
+def ardMsgParser(msg):
+    data = msg.split('|')
+    if data[0] in arduino_out:
+        return msg
+    else:
+        return None
+
 '''
 Parse messages received from PC, packages payload into
 a JSON holding a target and payload
@@ -32,6 +46,9 @@ def pcMsgParser(msg):
             'android': payload,
             'arduino': payload,
         }
+    elif command in arduino_commands:
+        target = 'arduino'
+        payload = command
 
     else:
         log.error('pcMsgParser unknown command: ' + str(command))

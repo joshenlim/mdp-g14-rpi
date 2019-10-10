@@ -1,6 +1,8 @@
 import os
 
-from src.communicator.MultiThread import MultiThread
+# Using Multiprocess instead of Multithread to employ all 4 cores of RPI
+# from src.communicator.MultiThread import MultiThread
+from src.communicator.MultiProcess import MultiProcess
 # from src.detector.SymbolDetector import SymbolDetector
 from src.Logger import Logger
 
@@ -9,7 +11,7 @@ log = Logger()
 def init():
     os.system("sudo hciconfig hci0 piscan")
     try:
-        multi_thread = MultiThread()
+        multi_thread = MultiProcess()
         multi_thread.start()
 
         # Currently SymbolDetector seems to be running really slow
