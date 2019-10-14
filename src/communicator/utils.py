@@ -1,7 +1,7 @@
 from src.Logger import Logger
 log = Logger()
 
-arduino_commands = ['H', 'F', 'S']
+arduino_commands = ['H', 'F', 'S', 'Z']
 arduino_out = ['SD', 'MC', 'CC', 'EC']
 
 '''
@@ -114,7 +114,7 @@ def fpParser(system, path_data):
                         or (dir_1 == 'E' and dir_2 == 'S')\
                         or (dir_1 == 'W' and dir_2 == 'N'):
                         step_seq.append('d')
-                    elif (dir == 'N' and dir_2 =='W')\
+                    elif (dir_1 == 'N' and dir_2 =='W')\
                         or (dir_1 == 'S' and dir_2 == 'E')\
                         or (dir_1 == 'E' and dir_2 == 'N')\
                         or (dir_1 == 'W' and dir_2 == 'S'):
@@ -126,7 +126,6 @@ def fpParser(system, path_data):
                         step_count = abs(int(x_1) - int(x_2))
                     else:
                         print('Error: ' + str(dir_1) + ', ' + str(dir_2))
-                
                     step_seq = step_seq + [ 'w' for x in range(step_count) ]
                     
     if system == 'android':

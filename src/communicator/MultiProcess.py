@@ -25,12 +25,12 @@ simultaneuously. Image Recognition will have to be run as a thread as well.
 class MultiProcess:
     def __init__(self):
         log.info('Initializing Multithread Communication')
-        # self.android = Android()
+        self.android = Android()
         self.arduino = Arduino()
         self.pc = PC()
         self.detector = SymbolDetector()
 
-        # self.android.connect()
+        self.android.connect()
         self.arduino.connect()
         self.pc.connect()
 
@@ -40,11 +40,11 @@ class MultiProcess:
 
     def start(self):
         # self.detector.start()
-
-        # r_android = Process(target=self.read_android, args=(self.pc_queue,))
-        # r_android.start()
-        # w_android = Process(target=self.write_android, args=(self.android_queue,))
-        # w_android.start()
+        
+        r_android = Process(target=self.read_android, args=(self.pc_queue,))
+        r_android.start()
+        w_android = Process(target=self.write_android, args=(self.android_queue,))
+        w_android.start()
 
         r_arduino = Process(target=self.read_arduino, args=(self.pc_queue,))
         r_arduino.start()
