@@ -24,6 +24,7 @@ class Multithread:
         _thread.start_new_thread(test_thread, ('Thread 1', 1))
         _thread.start_new_thread(test_thread, ('Thread 2', 2))
         _thread.start_new_thread(test_thread, ('Thread 3', 4))
+        print('Multithread Started')
 
     def end(self):
         print('End Multithread Session')

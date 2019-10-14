@@ -31,10 +31,15 @@ def runTests(verbose):
         log.info('pcMsgParser: Unknown Command  - Failed!')
 
     try:
-        msg_read = 'MDF|ffffffffffffffffffffffffffffdfffbfff7ffefffdfffbffffffffffffffffffffffffffff|00000000000000000000000000000000000000000000000000000000000000000000000000|S|1|1|0'
+        msg_read = 'MDF|ffffffffffffffffffffffffffffdfffbfff7ffefffdfffbffffffffffffffffffffffffffff|00000000000000000000000000000000000000000000000000000000000000000000000000|S|1|1|0|w1'
         pc_msg = pcMsgParser(msg_read)
-        assert pc_msg['target'] == 'android'
-        assert pc_msg['payload'] == msg_read
+        assert pc_msg['target'] == 'both'
+        assert pc_msg['payload']['android'] == 'MDF|ffffffffffffffffffffffffffffdfffbfff7ffefffdfffbffffffffffffffffffffffffffff|00000000000000000000000000000000000000000000000000000000000000000000000000|S|1|1|0'
+        assert pc_msg['payload']['arduino'] == 'w1'
+        if verbose:
+            log.info('Msg to parse: ' + msg_read)
+            log.info('Parsed Android: ' + pc_msg['payload']['android'])
+            log.info('Parsed Arduino: ' + pc_msg['payload']['arduino'])
         log.info('pcMsgParser: MDF - Passed!')
     except AssertionError as e:
         all_passed = False
@@ -54,6 +59,34 @@ def runTests(verbose):
     except AssertionError as e:
         all_passed = False
         log.error('pcMsgParser: FP  - Failed!')
+
+    try:
+        msg_read = "FP|(1,1,E);(1,5,E);(2,5,N);(4,5,N);(4,6,E);(4,9,E);(5,9,N);(8,9,N);(8,10,E);(8,13,E);(9,13,N);(10,13,N);(10,12,W)"
+        pc_msg = pcMsgParser(msg_read)
+        assert pc_msg['target'] == 'both'
+        assert pc_msg['payload']['arduino'] == 'w4aw3dw4aw4dw4aw2aw1'
+        if verbose:
+            log.info('Msg to parse: ' + msg_read)
+            log.info('Parsed Android: ' + pc_msg['payload']['android'])
+            log.info('Parsed Arduino: ' + pc_msg['payload']['arduino'])
+        log.info('pcMsgParser: FP2 - Passed!')
+    except AssertionError as e:
+        all_passed = False
+        log.error('pcMsgParser: FP2  - Failed!')
+
+    try:
+        msg_read = "FP|(1,1,E);(1,5,E);(2,5,N);(2,4,W)"
+        pc_msg = pcMsgParser(msg_read)
+        assert pc_msg['target'] == 'both'
+        assert pc_msg['payload']['arduino'] == 'w4aw1aw1'
+        if verbose:
+            log.info('Msg to parse: ' + msg_read)
+            log.info('Parsed Android: ' + pc_msg['payload']['android'])
+            log.info('Parsed Arduino: ' + pc_msg['payload']['arduino'])
+        log.info('pcMsgParser: FP3 - Passed!')
+    except AssertionError as e:
+        all_passed = False
+        log.error('pcMsgParser: FP3  - Failed!')
 
     if all_passed:
         log.info('All Tests Passed!')

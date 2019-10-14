@@ -1,6 +1,20 @@
 from src.Logger import Logger
 log = Logger()
 
+arduino_commands = ['H', 'F', 'S', 'Z']
+arduino_out = ['SD', 'MC', 'CC', 'EC']
+
+'''
+Parse messages received from Arduino, essentially filters out
+unnecessary messages
+'''
+def ardMsgParser(msg):
+    data = msg.split('|')
+    if data[0] in arduino_out:
+        return msg
+    else:
+        return None
+
 '''
 Parse messages received from PC, packages payload into
 a JSON holding a target and payload
@@ -20,7 +34,11 @@ def pcMsgParser(msg):
         }
 
     elif command == 'MDF':
-        target = 'android'
+        target = 'both'
+        payload = {
+            'android': mdfParser('android', msg),
+            'arduino': mdfParser('arduino', msg),
+        }
 
     elif command == 'EC':
         target = 'both'
@@ -28,6 +46,9 @@ def pcMsgParser(msg):
             'android': payload,
             'arduino': payload,
         }
+    elif command in arduino_commands:
+        target = 'arduino'
+        payload = command
 
     else:
         log.error('pcMsgParser unknown command: ' + str(command))
@@ -37,6 +58,17 @@ def pcMsgParser(msg):
         'target': target,
         'payload': payload
     }
+
+'''
+Parse MDP message from PC to a format consumable by
+Android or Arduino
+'''
+def mdfParser(system, mdf_string):
+    mdf_data = mdf_string.split('|')
+    if system == 'android':
+        return '|'.join(mdf_data[0 : len(mdf_data) - 1])
+    if system == 'arduino':
+        return mdf_data[len(mdf_data) - 1]
 
 '''
 Parse FP message from PC to a format consumable by
@@ -82,7 +114,7 @@ def fpParser(system, path_data):
                         or (dir_1 == 'E' and dir_2 == 'S')\
                         or (dir_1 == 'W' and dir_2 == 'N'):
                         step_seq.append('d')
-                    elif (dir == 'N' and dir_2 =='W')\
+                    elif (dir_1 == 'N' and dir_2 =='W')\
                         or (dir_1 == 'S' and dir_2 == 'E')\
                         or (dir_1 == 'E' and dir_2 == 'N')\
                         or (dir_1 == 'W' and dir_2 == 'S'):
@@ -94,7 +126,6 @@ def fpParser(system, path_data):
                         step_count = abs(int(x_1) - int(x_2))
                     else:
                         print('Error: ' + str(dir_1) + ', ' + str(dir_2))
-                
                     step_seq = step_seq + [ 'w' for x in range(step_count) ]
                     
     if system == 'android':

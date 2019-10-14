@@ -4,6 +4,7 @@ from src.Logger import Logger
 from src.config import SERIAL_PORT
 from src.config import BAUD_RATE
 from src.config import LOCALE
+from src.communicator.utils import ardMsgParser
 
 log = Logger()
 
@@ -49,7 +50,7 @@ class Arduino:
     def write(self, msg):
         try:
             self.connection.write(str.encode(msg))
-            log.info('Successfully wrote message to Arduino')
+            # log.info('Successfully wrote message to Arduino')
         except Exception as error:
             log.error('Arduino write failed: ' + str(error))
 
@@ -57,7 +58,7 @@ class Arduino:
         try:
             msg = self.connection.readline().strip().decode(LOCALE)
             if len(msg) > 0:
-                return msg
+                return ardMsgParser(msg)
             return None          
         except Exception as error:
             log.error('Arduino read failed: ' + str(error))

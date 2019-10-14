@@ -1,4 +1,6 @@
 import _thread
+
+from multiprocessing import Process, Queue
 import queue
 import os
 import cv2 as cv
@@ -17,47 +19,45 @@ Multithreading essentially refers to running multiple processes in parallel
 Communications between Rpi and other devices involve a session, which means
 the Rpi will be waiting for a trigger. Hence if single threaded, Rpi can only
 do one thing at one time. With multhreading, Rpi can have multiple sessions
-simultaneuously. Image Recognition will have to be run as a thread as well, but
-it seems to be running really slow at the moment. There's also an occasional
-error: Camera component couldn't be enabled: Out of resources. If hit that error
-just restart the process, wait a little for the resources to be released, then re
-run the main program
+simultaneuously. Image Recognition will have to be run as a thread as well.
 '''
 
-class MultiThread:
+class MultiProcess:
     def __init__(self):
         log.info('Initializing Multithread Communication')
-        # self.android = Android()
+        self.android = Android()
         self.arduino = Arduino()
         self.pc = PC()
         self.detector = SymbolDetector()
 
-        # self.android.connect()
+        self.android.connect()
         self.arduino.connect()
         self.pc.connect()
 
-        self.android_queue = queue.Queue(maxsize= 0)
-        self.arduino_queue = queue.Queue(maxsize=0)
-        self.pc_queue = queue.Queue(maxsize=0)
+        self.android_queue = Queue()
+        self.arduino_queue = Queue()
+        self.pc_queue = Queue()
 
     def start(self):
-        self.detector.start()
+        # self.detector.start()
         
-        # _thread.start_new_thread(self.read_android, (self.pc_queue,))
-        _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
-        _thread.start_new_thread(self.read_pc,(self.android_queue, self.arduino_queue,))
+        r_android = Process(target=self.read_android, args=(self.pc_queue,))
+        r_android.start()
+        w_android = Process(target=self.write_android, args=(self.android_queue,))
+        w_android.start()
 
-        # _thread.start_new_thread(self.write_android, (self.android_queue,))
-        _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
-        _thread.start_new_thread(self.write_pc, (self.pc_queue,))
+        r_arduino = Process(target=self.read_arduino, args=(self.pc_queue,))
+        r_arduino.start()
+        w_arduino = Process(target=self.write_arduino, args=(self.arduino_queue,))
+        w_arduino.start()
 
-        # _thread.start_new_thread(self.detect_symbols, (self.android_queue,))
+        r_pc = Process(target=self.read_pc, args=(self.android_queue, self.arduino_queue,))
+        r_pc.start()
+        w_pc = Process(target=self.write_pc, args=(self.pc_queue,))
+        w_pc.start()
 
-        log.info('Multithread Communication Session Started')
-
-        while True:
-            pass
-
+        # symbol_detect = Process(target=self.detect_symbols, args=(self.android_queue,))
+    
     def end(self):
         self.detector.end()
         log.info('Multithread Communication Session Ended')
@@ -69,8 +69,6 @@ class MultiThread:
                 if msg is not None:
                     log.info('Read Android:' + str(msg))
                     pc_queue.put_nowait(msg)
-                    # if msg == 'SV':
-                    #   arduino_queue.put_nowait(msg)
                     
             except Exception as e:
                 log.error("Android read failed: " + str(e))
