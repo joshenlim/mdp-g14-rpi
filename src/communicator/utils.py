@@ -1,8 +1,15 @@
+import json
 from src.Logger import Logger
 log = Logger()
 
 arduino_commands = ['H', 'F', 'S', 'Z']
 arduino_out = ['SD', 'MC', 'CC', 'EC']
+
+def format_for(target, payload):
+    return json.dumps({
+        'target': target,
+        'payload': payload
+    })
 
 '''
 Parse messages received from Arduino, essentially filters out
@@ -46,6 +53,11 @@ def pcMsgParser(msg):
             'android': payload,
             'arduino': payload,
         }
+
+    elif command == 'TP':
+        target = 'rpi'
+        payload = command
+        
     elif command in arduino_commands:
         target = 'arduino'
         payload = command

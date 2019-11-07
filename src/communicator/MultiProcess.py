@@ -37,38 +37,40 @@ class MultiProcess:
         self.android_queue = Queue()
         self.arduino_queue = Queue()
         self.pc_queue = Queue()
+        self.detector_queue = Queue()
+
+        self.frame_count = 0
 
     def start(self):
-        # self.detector.start()
+        self.detector.start()
+        time.sleep(3)
         
-        r_android = Process(target=self.read_android, args=(self.pc_queue,))
-        r_android.start()
-        w_android = Process(target=self.write_android, args=(self.android_queue,))
-        w_android.start()
+        r_android = Process(target=self.read_android, args=(self.pc_queue, self.detector_queue,)).start()
+        w_android = Process(target=self.write_android, args=(self.android_queue,)).start()
 
-        r_arduino = Process(target=self.read_arduino, args=(self.pc_queue,))
-        r_arduino.start()
-        w_arduino = Process(target=self.write_arduino, args=(self.arduino_queue,))
-        w_arduino.start()
+        r_arduino = Process(target=self.read_arduino, args=(self.pc_queue,)).start()
+        w_arduino = Process(target=self.write_arduino, args=(self.arduino_queue,)).start()
+        
+        r_pc = Process(target=self.read_pc, args=(self.android_queue, self.arduino_queue,)).start()
+        w_pc = Process(target=self.write_pc, args=(self.pc_queue,)).start() 
 
-        r_pc = Process(target=self.read_pc, args=(self.android_queue, self.arduino_queue,))
-        r_pc.start()
-        w_pc = Process(target=self.write_pc, args=(self.pc_queue,))
-        w_pc.start()
-
-        # symbol_detect = Process(target=self.detect_symbols, args=(self.android_queue,))
+        symbol_detect = Process(target=self.detect_symbols, args=(self.detector_queue, self.android_queue,)).start()
+        log.info('Multithread Communication Session Started')
     
     def end(self):
         self.detector.end()
         log.info('Multithread Communication Session Ended')
 
-    def read_android(self, pc_queue):
+    def read_android(self, pc_queue, detector_queue):
         while True:
             try:
                 msg = self.android.read()
                 if msg is not None:
                     log.info('Read Android:' + str(msg))
-                    pc_queue.put_nowait(msg)
+                    if msg == 'TP':
+                        detector_queue.put_nowait(msg)
+                    else:
+                        pc_queue.put_nowait(msg)
                     
             except Exception as e:
                 log.error("Android read failed: " + str(e))
@@ -119,11 +121,26 @@ class MultiProcess:
                 self.pc.write(msg)
                 log.info('Write PC: ' + str(msg))
 
-    def detect_symbols(self, android_queue):
+    def detect_symbols(self, detector_queue, android_queue):
         while True:
+            if not detector_queue.empty():
+                msg = detector_queue.get_nowait()
+                if msg == 'TP':
+                    print('Take photo')
+                    frame = self.detector.get_frame()
+                    self.frame_count = self.frame_count + 1
+                    print(frame[0][0], self.frame_count)
+                    
+                    # frame = self.detector.get_frame()
+                    # self.frame_count = self.frame_count + 1
+                    # print(frame[0][0], self.frame_count)
+                    # cv.imshow("Video Stream", frame)
+                    # key = cv.waitKey(1) & 0xFF
+            '''
             frame = self.detector.get_frame()
             symbol_match = self.detector.detect(frame)
             if symbol_match is not None:
                 print('Symbol Match ID: ' + str(symbol_match))
                 android_queue.put_nowait('SID|' + str(symbol_match))
+            '''
                     

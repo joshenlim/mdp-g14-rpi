@@ -1,12 +1,12 @@
 from src.detector.SymbolDetector import SymbolDetector
 from imutils.video import FPS
-detector = SymbolDetector()
+detector = SymbolDetector(width=650, height=480, framerate=32)
 detector.start()
 fps = FPS().start()
 
 frame_count = 0
 
-while frame_count < 100:
+while frame_count < 10000:
     frame = detector.get_frame()
     symbol_match = detector.detect(frame)
     if symbol_match is not None:

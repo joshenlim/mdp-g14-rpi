@@ -1,7 +1,8 @@
 import _thread
+from threading import Thread
 import queue
 import os
-import cv2 as cv
+# import cv2 as cv
 import time
 
 from src.Logger import Logger
@@ -11,7 +12,7 @@ from src.communicator.PC import PC
 from src.communicator.Android import Android
 
 log = Logger()
-
+ 
 '''
 Multithreading essentially refers to running multiple processes in parallel
 Communications between Rpi and other devices involve a session, which means
@@ -27,31 +28,42 @@ run the main program
 class MultiThread:
     def __init__(self):
         log.info('Initializing Multithread Communication')
-        # self.android = Android()
+        self.android = Android()
         self.arduino = Arduino()
         self.pc = PC()
         self.detector = SymbolDetector()
 
-        # self.android.connect()
+        self.android.connect()
         self.arduino.connect()
         self.pc.connect()
 
         self.android_queue = queue.Queue(maxsize= 0)
         self.arduino_queue = queue.Queue(maxsize=0)
         self.pc_queue = queue.Queue(maxsize=0)
+        self.detector_queue = queue.Queue(maxsize=0)
 
     def start(self):
-        self.detector.start()
+        # self.detector.start()
+
         
-        # _thread.start_new_thread(self.read_android, (self.pc_queue,))
+        _thread.start_new_thread(self.read_android, (self.pc_queue, self.detector_queue))
         _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
         _thread.start_new_thread(self.read_pc,(self.android_queue, self.arduino_queue,))
 
-        # _thread.start_new_thread(self.write_android, (self.android_queue,))
+        _thread.start_new_thread(self.write_android, (self.android_queue,))
         _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
         _thread.start_new_thread(self.write_pc, (self.pc_queue,))
+        
+        '''
+        Thread(target=self.read_android, args=(self.pc_queue, self.detector_queue,)).start()
+        Thread(target=self.read_arduino, args=(self.pc_queue,)).start()
+        Thread(target=self.read_pc, args=(self.android_queue, self.arduino_queue,)).start()
 
-        # _thread.start_new_thread(self.detect_symbols, (self.android_queue,))
+        Thread(target=self.write_android, args=(self.android_queue,)).start()
+        Thread(target=self.write_arduino, args=(self.arduino_queue,)).start()
+        Thread(target=self.write_pc, args=(self.pc_queue,)).start()
+        '''
+        # _thread.start_new_thread(self.detect_symbols, (self.detector_queue, self.android_queue,))
 
         log.info('Multithread Communication Session Started')
 
@@ -62,15 +74,16 @@ class MultiThread:
         self.detector.end()
         log.info('Multithread Communication Session Ended')
 
-    def read_android(self, pc_queue):
+    def read_android(self, pc_queue, detector_queue):
         while True:
             try:
                 msg = self.android.read()
                 if msg is not None:
                     log.info('Read Android:' + str(msg))
-                    pc_queue.put_nowait(msg)
-                    # if msg == 'SV':
-                    #   arduino_queue.put_nowait(msg)
+                    if msg == 'TP':
+                        detector_queue.put_nowait(msg)
+                    else:
+                        pc_queue.put_nowait(msg)
                     
             except Exception as e:
                 log.error("Android read failed: " + str(e))
@@ -82,7 +95,6 @@ class MultiThread:
                 try:
                     msg = android_queue.get_nowait()
                     self.android.write(msg)
-                    # log.info('Write Android: ' + str(msg))
                 except Exception as e:
                     log.error("Android write failed " + str(e))
                     self.android.connect()
@@ -121,11 +133,18 @@ class MultiThread:
                 self.pc.write(msg)
                 log.info('Write PC: ' + str(msg))
 
-    def detect_symbols(self, android_queue):
+    def detect_symbols(self, detector_queue, android_queue):
         while True:
             frame = self.detector.get_frame()
-            symbol_match = self.detector.detect(frame)
-            if symbol_match is not None:
-                print('Symbol Match ID: ' + str(symbol_match))
-                android_queue.put_nowait('SID|' + str(symbol_match))
-                    
+            # print(frame[0][0])
+            if not detector_queue.empty():
+                # Try match confidence of 1 frame
+                # If not good enough, will have to find a way to bump match_confidence
+                msg = detector_queue.get_nowait()
+                log.info('Detecting Symbols')
+                symbol_match = self.detector.detect(frame)
+                if symbol_match is not None:
+                    log.info('Symbol Match ID: ' + str(symbol_match))
+                    android_queue.put_nowait('SID|' + str(symbol_match))
+                else:
+                    log.info('No symbols detected in frame')
