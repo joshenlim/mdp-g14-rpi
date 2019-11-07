@@ -21,6 +21,7 @@ class VideoStream:
     def update(self):
         for frame in self.stream:
             self.frame = frame.array
+            # print('frame update', self.frame[0][0])
             self.raw_capture.truncate(0)
 
             if self.stopped:

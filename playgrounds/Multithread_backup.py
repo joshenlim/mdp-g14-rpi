@@ -12,29 +12,17 @@ from src.communicator.Android import Android
 
 log = Logger()
 
-'''
-Multithreading essentially refers to running multiple processes in parallel
-Communications between Rpi and other devices involve a session, which means
-the Rpi will be waiting for a trigger. Hence if single threaded, Rpi can only
-do one thing at one time. With multhreading, Rpi can have multiple sessions
-simultaneuously. Image Recognition will have to be run as a thread as well, but
-it seems to be running really slow at the moment. There's also an occasional
-error: Camera component couldn't be enabled: Out of resources. If hit that error
-just restart the process, wait a little for the resources to be released, then re
-run the main program
-'''
-
 class MultiThread:
     def __init__(self):
         log.info('Initializing Multithread Communication')
         # self.android = Android()
-        self.arduino = Arduino()
-        self.pc = PC()
+        # self.arduino = Arduino()
+        # self.pc = PC()
         self.detector = SymbolDetector()
 
         # self.android.connect()
-        self.arduino.connect()
-        self.pc.connect()
+        # self.arduino.connect()
+        # self.pc.connect()
 
         self.android_queue = queue.Queue(maxsize= 0)
         self.arduino_queue = queue.Queue(maxsize=0)
@@ -44,14 +32,14 @@ class MultiThread:
         self.detector.start()
         
         # _thread.start_new_thread(self.read_android, (self.pc_queue,))
-        _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
-        _thread.start_new_thread(self.read_pc,(self.android_queue, self.arduino_queue,))
+        # _thread.start_new_thread(self.read_arduino, (self.pc_queue,))
+        # _thread.start_new_thread(self.read_pc,(self.android_queue, self.arduino_queue,))
 
         # _thread.start_new_thread(self.write_android, (self.android_queue,))
-        _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
-        _thread.start_new_thread(self.write_pc, (self.pc_queue,))
+        # _thread.start_new_thread(self.write_arduino, (self.arduino_queue,))
+        # _thread.start_new_thread(self.write_pc, (self.pc_queue,))
 
-        # _thread.start_new_thread(self.detect_symbols, (self.android_queue,))
+        _thread.start_new_thread(self.detect_symbols, (self.android_queue,))
 
         log.info('Multithread Communication Session Started')
 
@@ -124,8 +112,14 @@ class MultiThread:
     def detect_symbols(self, android_queue):
         while True:
             frame = self.detector.get_frame()
+            print(frame[0][0])
+            time.sleep(2)
+            '''
             symbol_match = self.detector.detect(frame)
             if symbol_match is not None:
                 print('Symbol Match ID: ' + str(symbol_match))
                 android_queue.put_nowait('SID|' + str(symbol_match))
+            '''
                     
+mt = MultiThread()
+mt.start()

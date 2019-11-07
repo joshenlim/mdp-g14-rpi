@@ -19,3 +19,8 @@ Ensure that OpenCV 3.3.0 is installed
 
    Begins a multithread session that will establish communications with N7 Tablet, Arduino and PC. Also starts a video stream that will attempt to detect symbols in front of it. Program will conclude the ID of the detected symbol depending on an arbitrary threshold value.
    Still a work in progress - multithread communication is commented out for now to test the detection alone.
+
+## Connecting a new bluetooth device
+`sudo hciconfig hci0 piscan`
+
+`hcitool scan`

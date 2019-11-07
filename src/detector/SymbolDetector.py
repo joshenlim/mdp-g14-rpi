@@ -48,6 +48,7 @@ class SymbolDetector:
         
         _, contours, hierarchy = cv.findContours(pre_proc_frame, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
         contours = sorted(contours, key=cv.contourArea, reverse=True)
+        # cv.drawContours(image, contours, -1, (0, 0, 255), 3)
         filtered_contours = filter_contour_size(contours)
         cv.drawContours(image, filtered_contours, -1, (255, 0, 0), 3)
 
@@ -96,16 +97,18 @@ class SymbolDetector:
 
                 if self.match_symbol_id == closest_match['id']:
                     self.match_count = self.match_count + 1
-                    if (self.match_count == MATCH_CONFIDENCE_COUNT):
-                        return(closest_match['id'])
                     
                 else:
                     self.match_symbol_id = closest_match['id']
                     self.match_count = 1
+                    
+                if (self.match_count == MATCH_CONFIDENCE_COUNT):
+                        return(closest_match['id'])
             else:
                 self.match_symbol_id = None
                 self.match_count = 0
 
+        # Uncomment to visualize stream
         cv.imshow("Video Stream", image)
         key = cv.waitKey(1) & 0xFF
 
