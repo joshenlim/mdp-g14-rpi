@@ -15,11 +15,8 @@ from src.communicator.Android import Android
 log = Logger()
 
 '''
-Multithreading essentially refers to running multiple processes in parallel
-Communications between Rpi and other devices involve a session, which means
-the Rpi will be waiting for a trigger. Hence if single threaded, Rpi can only
-do one thing at one time. With multhreading, Rpi can have multiple sessions
-simultaneuously. Image Recognition will have to be run as a thread as well.
+Multiprocess to use all available cores on the Rpi
+Higher efficiency than multithreading
 '''
 
 class MultiProcess:
