@@ -1,4 +1,4 @@
-Pillow==2.6.1
+Pillow==8.3.2
 PyBluez==0.22
 RPi.GPIO==0.6.3
 RTIMULib==7.2.1
