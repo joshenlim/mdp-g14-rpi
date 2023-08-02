@@ -12,6 +12,11 @@ from src.Logger import Logger
 
 log = Logger()
 
+'''
+New structure for multiprocessing to have only 2 queues
+Image Recognition process to run in main program
+'''
+
 class MultiProcess:
     def __init__(self, verbose):
         log.info('Initializing Multiprocessing Communication')
@@ -21,9 +26,6 @@ class MultiProcess:
         self.pc = PC()
         self.detector = SymbolDetector()
 
-        # Just see if this makes the latency worse
-        # Otherwise try see if can do a mutex
-        # Essentially a separate process must be able to trigger the parent program
         self.msg_queue = Queue()
         self.img_queue = Queue()
         
