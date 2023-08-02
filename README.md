@@ -1,7 +1,7 @@
 # mdp-g14-rpi
 Raspberry Pi Codebase for CZ3004 MDP
 
-Ensure that OpenCV 3.3.0 is installed
+Ensure that OpenCV 3.3.0 is installed (This is a test)
 
 ## Set Up on Raspberry Pi
    Working on Raspbian Jessie (2016-02-26), with Python version 3.4.2. Ensure that OpenCV 3.3.0 is installed as well.
